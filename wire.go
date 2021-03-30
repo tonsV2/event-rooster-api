@@ -1,3 +1,5 @@
+//+build wireinject
+
 package main
 
 import (
@@ -9,7 +11,7 @@ import (
 	"github.com/tonsV2/race-rooster-api/services"
 )
 
-func buildServer() server.Server {
+func BuildServer() server.Server {
 	wire.Build(server.ProvideServer, models.ProvideDatabase,
 		repositories.ProvideRaceRepository, services.ProvideRaceService, controllers.ProvideRaceController,
 	)
