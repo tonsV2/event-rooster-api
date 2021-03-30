@@ -15,14 +15,14 @@ func ProvideRaceService(r RaceRepository) RaceService {
 	return RaceService{RaceRepository: r}
 }
 
-func (r *RaceService) Create(title string, date string) (Race, error) {
+func (r *RaceService) Create(title string, date string, email string) (Race, error) {
 	u4, err := uuid.NewV4()
 	if err != nil {
 		return Race{}, err
 	}
 	token := fmt.Sprint(u4)
 
-	race := Race{Title: title, Date: date, Token: token}
+	race := Race{Title: title, Date: date, Token: token, Email: email}
 	r.RaceRepository.Create(race)
 	return race, nil
 }

@@ -18,6 +18,7 @@ type RaceController struct {
 type CreateRaceInput struct {
 	Title string `json:"title" binding:"required"`
 	Date  string `json:"date" binding:"required"`
+	Email string `json:"email" binding:"required"`
 }
 
 func (r *RaceController) CreateRace(c *gin.Context) {
@@ -27,7 +28,7 @@ func (r *RaceController) CreateRace(c *gin.Context) {
 		return
 	}
 
-	race, err := r.RaceService.Create(input.Title, input.Date)
+	race, err := r.RaceService.Create(input.Title, input.Date, input.Email)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
