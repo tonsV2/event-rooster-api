@@ -3,6 +3,7 @@ package mail
 import (
 	"bytes"
 	"crypto/tls"
+	"flag"
 	"github.com/tonsV2/event-rooster-api/configurations"
 	"github.com/tonsV2/event-rooster-api/models"
 	"gopkg.in/mail.v2"
@@ -10,16 +11,21 @@ import (
 )
 
 func ProvideMailer(mailerConfiguration configurations.MailerConfiguration) Mailer {
+	templatePathPrefix := "./"
+	if flag.Lookup("test.v") != nil {
+		templatePathPrefix = "../"
+	}
+
 	return Mailer{
 		configuration: mailerConfiguration,
 
 		from: "sebastianthegreatful@something.com",
 
 		createEventSubject:  "New event created",
-		createEventTemplate: "./mail/templates/createEvent.html",
+		createEventTemplate: templatePathPrefix + "mail/templates/createEvent.html",
 
 		welcomeParticipantSubject:  "Welcome to the event",
-		welcomeParticipantTemplate: "./mail/templates/welcomeEvent.html",
+		welcomeParticipantTemplate: templatePathPrefix + "mail/templates/welcomeEvent.html",
 	}
 }
 
@@ -77,6 +83,10 @@ func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buf
 	message.SetHeader("Subject", subject)
 	message.SetBody("text/html", body.String())
 	d := mail.NewDialer(m.configuration.Host, m.configuration.Port, m.configuration.Username, m.configuration.Password)
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: false, ServerName: m.configuration.Host}
-	return d.DialAndSend(message)
+	if to == "test@mail.com" {
+		return nil
+	} else {
+		d.TLSConfig = &tls.Config{InsecureSkipVerify: false, ServerName: m.configuration.Host}
+		return d.DialAndSend(message)
+	}
 }

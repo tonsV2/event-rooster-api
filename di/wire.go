@@ -1,6 +1,6 @@
 //+build wireinject
 
-package main
+package di
 
 import (
 	"github.com/google/wire"
@@ -18,6 +18,7 @@ func BuildServer() server.Server {
 		configurations.ProvideMailerConfiguration, mail.ProvideMailer,
 		server.ProvideServer, models.ProvideDatabase,
 		repositories.ProvideEventRepository, services.ProvideEventService, controllers.ProvideEventController,
+		repositories.ProvideGroupRepository, services.ProvideGroupService,
 	)
 	return server.Server{}
 }

@@ -3,7 +3,7 @@
 //go:generate go run github.com/google/wire/cmd/wire
 //+build !wireinject
 
-package main
+package di
 
 import (
 	"github.com/tonsV2/event-rooster-api/configurations"
@@ -21,9 +21,11 @@ func BuildServer() server.Server {
 	db := models.ProvideDatabase()
 	eventRepository := repositories.ProvideEventRepository(db)
 	eventService := services.ProvideEventService(eventRepository)
+	groupRepository := repositories.ProvideGroupRepository(db)
+	groupService := services.ProvideGroupService(groupRepository)
 	mailerConfiguration := configurations.ProvideMailerConfiguration()
 	mailer := mail.ProvideMailer(mailerConfiguration)
-	eventController := controllers.ProvideEventController(eventService, mailer)
+	eventController := controllers.ProvideEventController(eventService, groupService, mailer)
 	serverServer := server.ProvideServer(eventController)
 	return serverServer
 }

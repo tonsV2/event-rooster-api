@@ -5,9 +5,14 @@ import (
 )
 
 type GroupDTO struct {
-	ID              uint `json:"id,string,omitempty"`
-	Datetime        string
-	MaxParticipants uint
+	ID              uint   `json:"id,string,omitempty"`
+	Datetime        string `json:"datetime"`
+	MaxParticipants uint   `json:"maxParticipants"`
+}
+
+type CreateGroupDTO struct {
+	Datetime        string `json:"datetime" binding:"required"`
+	MaxParticipants uint   `json:"maxParticipants" binding:"required"`
 }
 
 func ToGroupDTO(group models.Group) GroupDTO {

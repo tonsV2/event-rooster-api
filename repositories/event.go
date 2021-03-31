@@ -25,3 +25,11 @@ func (p *EventRepository) FindEventWithGroupsByToken(token string) (models.Event
 	}
 	return event, nil
 }
+
+func (p *EventRepository) FindByToken(token string) (models.Event, error) {
+	var event models.Event
+	if err := p.db.Find(&event, "token = ?", token).Error; err != nil {
+		return event, err
+	}
+	return event, nil
+}

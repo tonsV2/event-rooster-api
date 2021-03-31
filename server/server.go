@@ -22,6 +22,7 @@ func ProvideServer(eventController controllers.EventController) Server {
 func initializeEventController(r *gin.Engine, eventController controllers.EventController) {
 	r.POST("/events", eventController.CreateEvent)
 	r.GET("/events/groups", eventController.FindEventWithGroupsByToken)
+	r.POST("/events/groups", eventController.AddGroupToEventByToken)
 }
 
 func (s *Server) Run() {

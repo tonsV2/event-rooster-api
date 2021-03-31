@@ -30,3 +30,7 @@ func (r *EventService) Create(title string, date string, email string) (Event, e
 func (r *EventService) FindEventWithGroupsByToken(token string) (Event, error) {
 	return r.eventRepository.FindEventWithGroupsByToken(token)
 }
+
+func (r *EventService) FindToken(token string) (Event, error) {
+	return r.eventRepository.FindByToken(token)
+}
