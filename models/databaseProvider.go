@@ -10,19 +10,27 @@ import (
 )
 
 func ProvideDatabase() *gorm.DB {
-	database := provideSqliteDatabase()
-	//	database := providePostgresDatabase()
+	mode, _ := os.LookupEnv("GIN_MODE")
 
-	_ = database.AutoMigrate(
+	var db *gorm.DB
+	switch mode {
+	case "release":
+		db = providePostgresDatabase()
+	default:
+		db = provideSqliteDatabase()
+	}
+
+	_ = db.AutoMigrate(
 		&Event{},
 		&Group{},
 		&Participant{},
 	)
 
-	return database
+	return db
 }
 
 func providePostgresDatabase() *gorm.DB {
+	// TODO: Maybe use configurations.requireEnv here? Maybe not... Should this package depend on the configurations package?
 	host, _ := os.LookupEnv("DATABASE_HOST")
 	port, _ := os.LookupEnv("DATABASE_PORT")
 	username, _ := os.LookupEnv("DATABASE_USERNAME")
