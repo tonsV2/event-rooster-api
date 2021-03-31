@@ -13,6 +13,8 @@ import (
 	"testing"
 )
 
+var testEmail = "test@mail.com"
+
 func TestCreateEvent(t *testing.T) {
 	r := gofight.New()
 
@@ -20,7 +22,7 @@ func TestCreateEvent(t *testing.T) {
 
 	expectedTitle := "title"
 	expectedDate := "date"
-	expectedEmail := "test@mail.com"
+	expectedEmail := testEmail
 
 	eventDTO := dtos.CreateEventDTO{Title: expectedTitle, Date: expectedDate, Email: expectedEmail}
 
@@ -50,7 +52,7 @@ func TestFindEventWithGroupsByToken(t *testing.T) {
 
 	expectedTitle := "title"
 	expectedDate := "date"
-	expectedEmail := "test@mail.com"
+	expectedEmail := testEmail
 
 	createdEvent, _ := eventService.Create(expectedTitle, expectedDate, expectedEmail)
 
@@ -76,7 +78,7 @@ func TestAddGroupToEventByToken(t *testing.T) {
 
 	server := di.BuildServer()
 	eventService := getEventService()
-	createdEvent, _ := eventService.Create("title", "date", "test@mail.com")
+	createdEvent, _ := eventService.Create("title", "date", testEmail)
 
 	expectedDatetime := "datetime"
 	expectedMaxParticipants := uint(25)

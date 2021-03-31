@@ -10,6 +10,8 @@ import (
 	"html/template"
 )
 
+var testEmail = "test@mail.com"
+
 func ProvideMailer(mailerConfiguration configurations.MailerConfiguration) Mailer {
 	templatePathPrefix := "./"
 	if flag.Lookup("test.v") != nil {
@@ -83,7 +85,7 @@ func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buf
 	message.SetHeader("Subject", subject)
 	message.SetBody("text/html", body.String())
 	d := mail.NewDialer(m.configuration.Host, m.configuration.Port, m.configuration.Username, m.configuration.Password)
-	if to == "test@mail.com" {
+	if to == testEmail {
 		return nil
 	} else {
 		d.TLSConfig = &tls.Config{InsecureSkipVerify: false, ServerName: m.configuration.Host}
