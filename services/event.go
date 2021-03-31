@@ -23,14 +23,18 @@ func (r *EventService) Create(title string, date string, email string) (Event, e
 	token := fmt.Sprint(u4)
 
 	event := Event{Title: title, Date: date, Token: token, Email: email}
-	r.eventRepository.Create(event)
-	return event, nil
+	err = r.eventRepository.Create(&event)
+	return event, err
 }
 
 func (r *EventService) FindEventWithGroupsByToken(token string) (Event, error) {
 	return r.eventRepository.FindEventWithGroupsByToken(token)
 }
 
-func (r *EventService) FindToken(token string) (Event, error) {
+func (r *EventService) FindByToken(token string) (Event, error) {
 	return r.eventRepository.FindByToken(token)
+}
+
+func (r *EventService) AddParticipantToEvent(event Event, participant Participant) error {
+	return r.eventRepository.AddParticipant(event, participant)
 }

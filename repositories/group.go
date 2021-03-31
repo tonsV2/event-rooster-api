@@ -13,7 +13,6 @@ func ProvideGroupRepository(DB *gorm.DB) GroupRepository {
 	return GroupRepository{db: DB}
 }
 
-func (p *GroupRepository) Create(group models.Group) models.Group {
-	p.db.Create(&group)
-	return group
+func (p *GroupRepository) Create(group *models.Group) error {
+	return p.db.Create(&group).Error
 }

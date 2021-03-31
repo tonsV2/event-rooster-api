@@ -13,9 +13,8 @@ func ProvideEventRepository(DB *gorm.DB) EventRepository {
 	return EventRepository{db: DB}
 }
 
-func (p *EventRepository) Create(event models.Event) models.Event {
-	p.db.Create(&event)
-	return event
+func (p *EventRepository) Create(event *models.Event) error {
+	return p.db.Create(&event).Error
 }
 
 func (p *EventRepository) FindEventWithGroupsByToken(token string) (models.Event, error) {
@@ -32,4 +31,8 @@ func (p *EventRepository) FindByToken(token string) (models.Event, error) {
 		return event, err
 	}
 	return event, nil
+}
+
+func (p *EventRepository) AddParticipant(event models.Event, participant models.Participant) error {
+	return p.db.Model(&event).Association("Participants").Append([]*models.Participant{&participant})
 }

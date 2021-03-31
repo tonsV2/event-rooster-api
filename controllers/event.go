@@ -58,7 +58,7 @@ func (e *EventController) AddGroupToEventByToken(c *gin.Context) {
 		handleError(c, err)
 	}
 
-	event, err := e.eventService.FindToken(token)
+	event, err := e.eventService.FindByToken(token)
 	if err != nil {
 		handleError(c, err)
 	}
@@ -67,9 +67,4 @@ func (e *EventController) AddGroupToEventByToken(c *gin.Context) {
 
 	groupDTO := dtos.ToGroupDTO(group)
 	c.JSON(http.StatusCreated, groupDTO)
-}
-
-func handleError(c *gin.Context, err error) {
-	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	panic(err)
 }

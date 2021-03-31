@@ -26,6 +26,9 @@ func BuildServer() server.Server {
 	mailerConfiguration := configurations.ProvideMailerConfiguration()
 	mailer := mail.ProvideMailer(mailerConfiguration)
 	eventController := controllers.ProvideEventController(eventService, groupService, mailer)
-	serverServer := server.ProvideServer(eventController)
+	participantRepository := repositories.ProvideParticipantRepository(db)
+	participantService := services.ProvideParticipantService(participantRepository)
+	participantController := controllers.ProvideParticipantController(eventService, participantService, mailer)
+	serverServer := server.ProvideServer(eventController, participantController)
 	return serverServer
 }

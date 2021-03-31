@@ -61,21 +61,21 @@ func (m *Mailer) SendCreateEventMail(event models.Event) error {
 }
 
 func (m *Mailer) SendWelcomeParticipantMail(event models.Event, participant models.Participant) error {
-	to := event.Email
-
 	t, _ := template.ParseFiles(m.welcomeParticipantTemplate)
 	var body bytes.Buffer
 	_ = t.Execute(&body, struct {
+		EventId uint
 		Title   string
 		Message string
 		Token   string
 	}{
+		EventId: event.ID,
 		Title:   event.Title,
 		Message: "This is a test message in a HTML template",
-		Token:   event.Token,
+		Token:   participant.Token,
 	})
 
-	return m.sendMail(m.from, to, m.welcomeParticipantSubject, body)
+	return m.sendMail(m.from, participant.Email, m.welcomeParticipantSubject, body)
 }
 
 func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buffer) error {

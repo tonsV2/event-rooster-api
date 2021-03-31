@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
     <body>
-        <p>Welcome to... Some event. Please select a group</p>
-        <span>Title: </span><span>{{.Title}}</span><br/>
+        <p>Welcome to... {{.Title}}</p>
         <span>Message: </span><span>{{.Message}}</span><br/>
-        <span>Token: </span><span>{{.Token}}</span><br/>
+        <p>Please select a group by using the below link</p>
+        <span>https://some-url.com/event/{{.EventId}}?token={{.Token}}</span><br/>
     </body>
 </html>
