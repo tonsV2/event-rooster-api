@@ -1,4 +1,4 @@
-module github.com/tonsV2/race-rooster-api
+module github.com/tonsV2/event-rooster-api
 
 go 1.15
 

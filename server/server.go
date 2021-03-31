@@ -3,24 +3,24 @@ package server
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/tonsV2/race-rooster-api/controllers"
+	"github.com/tonsV2/event-rooster-api/controllers"
 )
 
 type Server struct {
 	Engine *gin.Engine
 }
 
-func ProvideServer(raceController controllers.RaceController) Server {
+func ProvideServer(eventController controllers.EventController) Server {
 	r := gin.Default()
 	r.Use(cors.Default())
 
-	initializeRaceController(r, raceController)
+	initializeEventController(r, eventController)
 
 	return Server{Engine: r}
 }
 
-func initializeRaceController(r *gin.Engine, raceController controllers.RaceController) {
-	r.POST("/races", raceController.CreateRace)
+func initializeEventController(r *gin.Engine, eventController controllers.EventController) {
+	r.POST("/events", eventController.CreateEvent)
 }
 
 func (s *Server) Run() {

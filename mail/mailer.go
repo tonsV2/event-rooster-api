@@ -3,8 +3,8 @@ package mail
 import (
 	"bytes"
 	"crypto/tls"
-	"github.com/tonsV2/race-rooster-api/configurations"
-	"github.com/tonsV2/race-rooster-api/models"
+	"github.com/tonsV2/event-rooster-api/configurations"
+	"github.com/tonsV2/event-rooster-api/models"
 	"gopkg.in/mail.v2"
 	"html/template"
 )
@@ -15,11 +15,11 @@ func ProvideMailer(mailerConfiguration configurations.MailerConfiguration) Maile
 
 		from: "sebastianthegreatful@something.com",
 
-		createRaceSubject:  "New race created",
-		createRaceTemplate: "./mail/templates/createRace.html",
+		createEventSubject:  "New event created",
+		createEventTemplate: "./mail/templates/createEvent.html",
 
-		welcomeRunnerSubject:  "Welcome to the race",
-		welcomeRunnerTemplate: "./mail/templates/welcomeRunner.html",
+		welcomeRunnerSubject:  "Welcome to the event",
+		welcomeRunnerTemplate: "./mail/templates/welcomeEvent.html",
 	}
 }
 
@@ -27,33 +27,33 @@ type Mailer struct {
 	configuration configurations.MailerConfiguration
 	from          string
 
-	createRaceSubject  string
-	createRaceTemplate string
+	createEventSubject  string
+	createEventTemplate string
 
 	welcomeRunnerSubject  string
 	welcomeRunnerTemplate string
 }
 
-func (m *Mailer) SendCreateRaceMail(race models.Race) error {
-	to := race.Email
+func (m *Mailer) SendCreateEventMail(event models.Event) error {
+	to := event.Email
 
-	t, _ := template.ParseFiles(m.createRaceTemplate)
+	t, _ := template.ParseFiles(m.createEventTemplate)
 	var body bytes.Buffer
 	_ = t.Execute(&body, struct {
 		Title   string
 		Message string
 		Token   string
 	}{
-		Title:   race.Title,
+		Title:   event.Title,
 		Message: "This is a test message in a HTML template",
-		Token:   race.Token,
+		Token:   event.Token,
 	})
 
-	return m.sendMail(m.from, to, m.createRaceSubject, body)
+	return m.sendMail(m.from, to, m.createEventSubject, body)
 }
 
-func (m *Mailer) SendWelcomeRunnerMail(race models.Race, runner models.Runner) error {
-	to := race.Email
+func (m *Mailer) SendWelcomeRunnerMail(event models.Event, runner models.Runner) error {
+	to := event.Email
 
 	t, _ := template.ParseFiles(m.welcomeRunnerTemplate)
 	var body bytes.Buffer
@@ -62,9 +62,9 @@ func (m *Mailer) SendWelcomeRunnerMail(race models.Race, runner models.Runner) e
 		Message string
 		Token   string
 	}{
-		Title:   race.Title,
+		Title:   event.Title,
 		Message: "This is a test message in a HTML template",
-		Token:   race.Token,
+		Token:   event.Token,
 	})
 
 	return m.sendMail(m.from, to, m.welcomeRunnerSubject, body)

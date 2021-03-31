@@ -14,7 +14,7 @@ func ProvideDatabase() *gorm.DB {
 	//	database := providePostgresDatabase()
 
 	_ = database.AutoMigrate(
-		&Race{},
+		&Event{},
 		&Heat{},
 		&Runner{},
 	)
@@ -56,7 +56,7 @@ func provideSqliteDatabase() *gorm.DB {
 	}
 
 	_ = database.AutoMigrate(
-		&Race{},
+		&Event{},
 		&Heat{},
 		&Runner{},
 	)

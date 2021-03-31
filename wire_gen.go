@@ -6,24 +6,24 @@
 package main
 
 import (
-	"github.com/tonsV2/race-rooster-api/configurations"
-	"github.com/tonsV2/race-rooster-api/controllers"
-	"github.com/tonsV2/race-rooster-api/mail"
-	"github.com/tonsV2/race-rooster-api/models"
-	"github.com/tonsV2/race-rooster-api/repositories"
-	"github.com/tonsV2/race-rooster-api/server"
-	"github.com/tonsV2/race-rooster-api/services"
+	"github.com/tonsV2/event-rooster-api/configurations"
+	"github.com/tonsV2/event-rooster-api/controllers"
+	"github.com/tonsV2/event-rooster-api/mail"
+	"github.com/tonsV2/event-rooster-api/models"
+	"github.com/tonsV2/event-rooster-api/repositories"
+	"github.com/tonsV2/event-rooster-api/server"
+	"github.com/tonsV2/event-rooster-api/services"
 )
 
 // Injectors from wire.go:
 
 func BuildServer() server.Server {
 	db := models.ProvideDatabase()
-	raceRepository := repositories.ProvideRaceRepository(db)
-	raceService := services.ProvideRaceService(raceRepository)
+	eventRepository := repositories.ProvideEventRepository(db)
+	eventService := services.ProvideEventService(eventRepository)
 	mailerConfiguration := configurations.ProvideMailerConfiguration()
 	mailer := mail.ProvideMailer(mailerConfiguration)
-	raceController := controllers.ProvideRaceController(raceService, mailer)
-	serverServer := server.ProvideServer(raceController)
+	eventController := controllers.ProvideEventController(eventService, mailer)
+	serverServer := server.ProvideServer(eventController)
 	return serverServer
 }
