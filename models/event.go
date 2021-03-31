@@ -8,6 +8,6 @@ type Event struct {
 	Date    string
 	Email   string
 	Token   string   `gorm:"index;"`
-	Heats   []Heat   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Groups  []Group  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Runners []Runner `gorm:"many2many:event_runners;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

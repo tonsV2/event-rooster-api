@@ -15,7 +15,7 @@ func ProvideDatabase() *gorm.DB {
 
 	_ = database.AutoMigrate(
 		&Event{},
-		&Heat{},
+		&Group{},
 		&Runner{},
 	)
 
@@ -57,7 +57,7 @@ func provideSqliteDatabase() *gorm.DB {
 
 	_ = database.AutoMigrate(
 		&Event{},
-		&Heat{},
+		&Group{},
 		&Runner{},
 	)
 

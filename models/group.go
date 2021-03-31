@@ -2,10 +2,10 @@ package models
 
 import "gorm.io/gorm"
 
-type Heat struct {
+type Group struct {
 	gorm.Model
 	EventID         uint
 	Datetime        string
 	MaxParticipants uint
-	Runners         []Runner `gorm:"many2many:runner_heats;"`
+	Runners         []Runner `gorm:"many2many:runner_groups;"`
 }
