@@ -63,7 +63,10 @@ func (e *EventController) AddGroupToEventByToken(c *gin.Context) {
 		handleError(c, err)
 	}
 
-	group := e.groupService.Create(event.ID, input.Datetime, input.MaxParticipants)
+	group, err := e.groupService.Create(event.ID, input.Datetime, input.MaxParticipants)
+	if err != nil {
+		handleError(c, err)
+	}
 
 	groupDTO := dtos.ToGroupDTO(group)
 	c.JSON(http.StatusCreated, groupDTO)
