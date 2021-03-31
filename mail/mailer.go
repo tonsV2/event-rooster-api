@@ -18,8 +18,8 @@ func ProvideMailer(mailerConfiguration configurations.MailerConfiguration) Maile
 		createEventSubject:  "New event created",
 		createEventTemplate: "./mail/templates/createEvent.html",
 
-		welcomeRunnerSubject:  "Welcome to the event",
-		welcomeRunnerTemplate: "./mail/templates/welcomeEvent.html",
+		welcomeParticipantSubject:  "Welcome to the event",
+		welcomeParticipantTemplate: "./mail/templates/welcomeEvent.html",
 	}
 }
 
@@ -30,8 +30,8 @@ type Mailer struct {
 	createEventSubject  string
 	createEventTemplate string
 
-	welcomeRunnerSubject  string
-	welcomeRunnerTemplate string
+	welcomeParticipantSubject  string
+	welcomeParticipantTemplate string
 }
 
 func (m *Mailer) SendCreateEventMail(event models.Event) error {
@@ -52,10 +52,10 @@ func (m *Mailer) SendCreateEventMail(event models.Event) error {
 	return m.sendMail(m.from, to, m.createEventSubject, body)
 }
 
-func (m *Mailer) SendWelcomeRunnerMail(event models.Event, runner models.Runner) error {
+func (m *Mailer) SendWelcomeParticipantMail(event models.Event, participant models.Participant) error {
 	to := event.Email
 
-	t, _ := template.ParseFiles(m.welcomeRunnerTemplate)
+	t, _ := template.ParseFiles(m.welcomeParticipantTemplate)
 	var body bytes.Buffer
 	_ = t.Execute(&body, struct {
 		Title   string
@@ -67,7 +67,7 @@ func (m *Mailer) SendWelcomeRunnerMail(event models.Event, runner models.Runner)
 		Token:   event.Token,
 	})
 
-	return m.sendMail(m.from, to, m.welcomeRunnerSubject, body)
+	return m.sendMail(m.from, to, m.welcomeParticipantSubject, body)
 }
 
 func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buffer) error {

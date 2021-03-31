@@ -7,5 +7,5 @@ type Group struct {
 	EventID         uint
 	Datetime        string
 	MaxParticipants uint
-	Runners         []Runner `gorm:"many2many:runner_groups;"`
+	Participants    []Participant `gorm:"many2many:participant_groups;"`
 }
