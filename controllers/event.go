@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	models "github.com/tonsV2/event-rooster-api/dtos"
+	"github.com/tonsV2/event-rooster-api/dtos"
 	"github.com/tonsV2/event-rooster-api/mail"
 	"net/http"
 
@@ -10,31 +10,43 @@ import (
 )
 
 func ProvideEventController(r services.EventService, m mail.Mailer) EventController {
-	return EventController{EventService: r, Mailer: m}
+	return EventController{eventService: r, mailer: m}
 }
 
 type EventController struct {
-	EventService services.EventService
-	Mailer       mail.Mailer
+	eventService services.EventService
+	mailer       mail.Mailer
 }
 
-func (r *EventController) CreateEvent(c *gin.Context) {
-	var input models.CreateEventDTO
+func (e *EventController) CreateEvent(c *gin.Context) {
+	var input dtos.CreateEventDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
 		handleError(c, err)
 	}
 
-	event, err := r.EventService.Create(input.Title, input.Date, input.Email)
+	event, err := e.eventService.Create(input.Title, input.Date, input.Email)
 	if err != nil {
 		handleError(c, err)
 	}
 
-	if err := r.Mailer.SendCreateEventMail(event); err != nil {
+	if err := e.mailer.SendCreateEventMail(event); err != nil {
 		handleError(c, err)
 	}
 
-	eventDTO := models.ToEventDTO(event)
+	eventDTO := dtos.ToEventDTO(event)
 	c.JSON(http.StatusCreated, eventDTO)
+}
+
+func (e *EventController) FindEventWithGroupsByToken(c *gin.Context) {
+	token := c.Query("token")
+
+	event, err := e.eventService.FindEventWithGroupsByToken(token)
+	if err != nil {
+		handleError(c, err)
+	}
+
+	eventDTO := dtos.ToEventWithGroupsDTO(event)
+	c.JSON(http.StatusOK, eventDTO)
 }
 
 func handleError(c *gin.Context, err error) {

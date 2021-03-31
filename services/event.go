@@ -8,11 +8,11 @@ import (
 )
 
 type EventService struct {
-	EventRepository EventRepository
+	eventRepository EventRepository
 }
 
 func ProvideEventService(r EventRepository) EventService {
-	return EventService{EventRepository: r}
+	return EventService{eventRepository: r}
 }
 
 func (r *EventService) Create(title string, date string, email string) (Event, error) {
@@ -23,6 +23,10 @@ func (r *EventService) Create(title string, date string, email string) (Event, e
 	token := fmt.Sprint(u4)
 
 	event := Event{Title: title, Date: date, Token: token, Email: email}
-	r.EventRepository.Create(event)
+	r.eventRepository.Create(event)
 	return event, nil
+}
+
+func (r *EventService) FindEventWithGroupsByToken(token string) (Event, error) {
+	return r.eventRepository.FindEventWithGroupsByToken(token)
 }
