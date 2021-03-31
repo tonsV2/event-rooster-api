@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	models "github.com/tonsV2/race-rooster-api/dtos"
 	"github.com/tonsV2/race-rooster-api/mail"
 	"net/http"
 
@@ -17,14 +18,8 @@ type RaceController struct {
 	Mailer      mail.Mailer
 }
 
-type CreateRaceInput struct {
-	Title string `json:"title" binding:"required"`
-	Date  string `json:"date" binding:"required"`
-	Email string `json:"email" binding:"required"`
-}
-
 func (r *RaceController) CreateRace(c *gin.Context) {
-	var input CreateRaceInput
+	var input models.CreateRaceDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
 		handleError(c, err)
 	}
@@ -38,7 +33,8 @@ func (r *RaceController) CreateRace(c *gin.Context) {
 		handleError(c, err)
 	}
 
-	c.JSON(http.StatusCreated, race)
+	raceDTO := models.ToRaceDTO(race)
+	c.JSON(http.StatusCreated, raceDTO)
 }
 
 func handleError(c *gin.Context, err error) {
