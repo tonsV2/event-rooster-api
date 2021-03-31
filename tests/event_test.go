@@ -82,10 +82,7 @@ func TestAddGroupToEventByToken(t *testing.T) {
 
 	expectedDatetime := "datetime"
 	expectedMaxParticipants := uint(25)
-	groupDTO := dtos.CreateGroupDTO{
-		Datetime:        expectedDatetime,
-		MaxParticipants: expectedMaxParticipants,
-	}
+	groupDTO := dtos.CreateGroupDTO{Datetime: expectedDatetime, MaxParticipants: expectedMaxParticipants}
 
 	r.POST("/events/groups").
 		SetQuery(gofight.H{"token": createdEvent.Token}).
@@ -99,6 +96,33 @@ func TestAddGroupToEventByToken(t *testing.T) {
 
 			assert.Equal(t, expectedDatetime, datetime.String())
 			assert.Equal(t, expectedMaxParticipants, uint(maxParticipants.Uint()))
+			assert.Equal(t, http.StatusCreated, r.Code)
+		})
+}
+
+func TestAddParticipantToEventByToken(t *testing.T) {
+	r := gofight.New()
+
+	server := di.BuildServer()
+	eventService := getEventService()
+	createdEvent, _ := eventService.Create("title", "date", testEmail)
+
+	expectedName := "name"
+	expectedEmail := "test@mail.com"
+	participantDTO := dtos.CreateParticipantDTO{Name: expectedName, Email: expectedEmail}
+
+	r.POST("/participants").
+		SetQuery(gofight.H{"token": createdEvent.Token}).
+		SetJSONInterface(participantDTO).
+		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
+
+			data := []byte(r.Body.String())
+
+			name := gjson.GetBytes(data, "name")
+			email := gjson.GetBytes(data, "email")
+
+			assert.Equal(t, expectedName, name.String())
+			assert.Equal(t, expectedEmail, email.String())
 			assert.Equal(t, http.StatusCreated, r.Code)
 		})
 }
