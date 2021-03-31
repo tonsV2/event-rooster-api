@@ -1,18 +1,20 @@
 package controllers
 
 import (
+	"github.com/tonsV2/race-rooster-api/mail"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	. "github.com/tonsV2/race-rooster-api/services"
+	"github.com/tonsV2/race-rooster-api/services"
 )
 
-func ProvideRaceController(r RaceService) RaceController {
-	return RaceController{RaceService: r}
+func ProvideRaceController(r services.RaceService, m mail.Mailer) RaceController {
+	return RaceController{RaceService: r, Mailer: m}
 }
 
 type RaceController struct {
-	RaceService RaceService
+	RaceService services.RaceService
+	Mailer      mail.Mailer
 }
 
 type CreateRaceInput struct {
@@ -24,15 +26,22 @@ type CreateRaceInput struct {
 func (r *RaceController) CreateRace(c *gin.Context) {
 	var input CreateRaceInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		handleError(c, err)
 	}
 
 	race, err := r.RaceService.Create(input.Title, input.Date, input.Email)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		handleError(c, err)
+	}
+
+	if err := r.Mailer.SendCreateRaceMail(race); err != nil {
+		handleError(c, err)
 	}
 
 	c.JSON(http.StatusCreated, race)
+}
+
+func handleError(c *gin.Context, err error) {
+	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	panic(err)
 }

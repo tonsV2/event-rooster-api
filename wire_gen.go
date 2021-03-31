@@ -6,7 +6,9 @@
 package main
 
 import (
+	"github.com/tonsV2/race-rooster-api/configurations"
 	"github.com/tonsV2/race-rooster-api/controllers"
+	"github.com/tonsV2/race-rooster-api/mail"
 	"github.com/tonsV2/race-rooster-api/models"
 	"github.com/tonsV2/race-rooster-api/repositories"
 	"github.com/tonsV2/race-rooster-api/server"
@@ -19,7 +21,9 @@ func BuildServer() server.Server {
 	db := models.ProvideDatabase()
 	raceRepository := repositories.ProvideRaceRepository(db)
 	raceService := services.ProvideRaceService(raceRepository)
-	raceController := controllers.ProvideRaceController(raceService)
+	mailerConfiguration := configurations.ProvideMailerConfiguration()
+	mailer := mail.ProvideMailer(mailerConfiguration)
+	raceController := controllers.ProvideRaceController(raceService, mailer)
 	serverServer := server.ProvideServer(raceController)
 	return serverServer
 }
