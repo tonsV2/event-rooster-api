@@ -36,13 +36,3 @@ func ToEventWithGroupsDTO(event models.Event) EventWithGroupsDTO {
 func ToEventDTO(event models.Event) EventDTO {
 	return EventDTO{ID: event.ID, Title: event.Title, Date: event.Date, Email: event.Email, Token: event.Token}
 }
-
-func ToEventDTOs(events []models.Event) []EventDTO {
-	eventDtos := make([]EventDTO, len(events))
-
-	for i, event := range events {
-		eventDtos[i] = ToEventDTO(event)
-	}
-
-	return eventDtos
-}
