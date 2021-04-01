@@ -46,3 +46,7 @@ func (r *EventService) FindByIdAndParticipantToken(eventId uint, participantToke
 func (r *EventService) FindEventWithGroupsAndParticipantsByToken(token string) (Event, error) {
 	return r.eventRepository.FindEventWithGroupsAndParticipantsByToken(token)
 }
+
+func (r *EventService) FindEventParticipantsNotInAGroupByToken(token string) ([]Participant, error) {
+	return r.eventRepository.FindEventParticipantsNotInAGroupByToken(token)
+}

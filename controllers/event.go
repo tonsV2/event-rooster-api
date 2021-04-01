@@ -83,3 +83,15 @@ func (e *EventController) GetEventWithGroupsAndParticipantsByToken(c *gin.Contex
 	eventDTO := dtos.ToEventWithGroupsAndParticipantsDTO(event)
 	c.JSON(http.StatusOK, eventDTO)
 }
+
+func (e *EventController) FindEventParticipantsNotInAGroupByToken(c *gin.Context) {
+	token := c.Query("token")
+
+	participants, err := e.eventService.FindEventParticipantsNotInAGroupByToken(token)
+	if err != nil {
+		handleError(c, err)
+	}
+
+	participantDTOS := dtos.ToParticipantsWithoutTokenDTO(participants)
+	c.JSON(http.StatusOK, participantDTOS)
+}

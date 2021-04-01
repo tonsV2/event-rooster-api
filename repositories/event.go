@@ -49,3 +49,31 @@ func (p *EventRepository) FindEventWithGroupsAndParticipantsByToken(token string
 	err := p.db.Preload("Groups.Participants").Find(&event, "token = ?", token).Error
 	return event, err
 }
+
+func (p *EventRepository) FindEventParticipantsNotInAGroupByToken(token string) ([]models.Participant, error) {
+	var event models.Event
+	err := p.db.Find(&event, "token = ?", token).Error
+
+	groupIds := p.db.
+		Model(&models.Group{}).
+		Select("id").
+		Where("event_id = ?", event.ID)
+
+	/* Participants associated with an event but not in a group
+	   select id
+	   from participants
+	   	inner join participant_groups pg on participants.id = pg.participant_id
+	   where group_id in (1, 2) -- groupIds
+	*/
+	groupedParticipantIds := p.db.
+		Model(&models.Participant{}).
+		Select("ID").
+		Joins("inner join participant_groups pg on participants.id = pg.participant_id").
+		Where("group_id in (?)", groupIds)
+
+	err = p.db.
+		Preload("Participants", "id not in (?)", groupedParticipantIds).
+		Find(&event, event.ID).Error
+
+	return event.Participants, err
+}
