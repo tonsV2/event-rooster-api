@@ -15,7 +15,7 @@ func ProvideParticipantService(r ParticipantRepository) ParticipantService {
 	return ParticipantService{participantRepository: r}
 }
 
-func (r *ParticipantService) CreateOrFind(name string, email string) (Participant, error) {
+func (p *ParticipantService) CreateOrFind(name string, email string) (Participant, error) {
 	u4, err := uuid.NewV4()
 	if err != nil {
 		return Participant{}, err
@@ -23,9 +23,9 @@ func (r *ParticipantService) CreateOrFind(name string, email string) (Participan
 	token := fmt.Sprint(u4)
 
 	participant := Participant{Name: name, Email: email, Token: token}
-	err = r.participantRepository.Create(&participant)
+	err = p.participantRepository.Create(&participant)
 	if err != nil && err.Error() == "UNIQUE constraint failed: participants.email" {
-		return r.participantRepository.FindByEmail(email)
+		return p.participantRepository.FindByEmail(email)
 	}
 	return participant, err
 }

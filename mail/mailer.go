@@ -10,7 +10,7 @@ import (
 	"html/template"
 )
 
-var testEmail = "test@mail.com"
+var testEmails = []string{"test@mail.com", "test1@mail.com", "test2@mail.com"}
 
 func ProvideMailer(mailerConfiguration configurations.MailerConfiguration) Mailer {
 	templatePathPrefix := "./"
@@ -85,10 +85,19 @@ func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buf
 	message.SetHeader("Subject", subject)
 	message.SetBody("text/html", body.String())
 	d := mail.NewDialer(m.configuration.Host, m.configuration.Port, m.configuration.Username, m.configuration.Password)
-	if to == testEmail {
+	if contains(testEmails, to) {
 		return nil
 	} else {
 		d.TLSConfig = &tls.Config{InsecureSkipVerify: false, ServerName: m.configuration.Host}
 		return d.DialAndSend(message)
 	}
+}
+
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

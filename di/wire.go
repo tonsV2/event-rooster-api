@@ -19,7 +19,7 @@ func BuildServer() server.Server {
 		models.ProvideDatabase,
 		configurations.ProvideMailerConfiguration, mail.ProvideMailer,
 		repositories.ProvideEventRepository, services.ProvideEventService, controllers.ProvideEventController,
-		repositories.ProvideGroupRepository, services.ProvideGroupService,
+		repositories.ProvideGroupRepository, services.ProvideGroupService, controllers.ProvideGroupController,
 		repositories.ProvideParticipantRepository, services.ProvideParticipantService, controllers.ProvideParticipantController,
 	)
 	return server.Server{}

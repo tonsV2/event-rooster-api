@@ -29,6 +29,7 @@ func BuildServer() server.Server {
 	participantRepository := repositories.ProvideParticipantRepository(db)
 	participantService := services.ProvideParticipantService(participantRepository)
 	participantController := controllers.ProvideParticipantController(eventService, participantService, mailer)
-	serverServer := server.ProvideServer(eventController, participantController)
+	groupController := controllers.ProvideGroupController(eventService, groupService)
+	serverServer := server.ProvideServer(eventController, participantController, groupController)
 	return serverServer
 }

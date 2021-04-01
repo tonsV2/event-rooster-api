@@ -38,3 +38,7 @@ func (r *EventService) FindByToken(token string) (Event, error) {
 func (r *EventService) AddParticipantToEvent(event Event, participant Participant) error {
 	return r.eventRepository.AddParticipant(event, participant)
 }
+
+func (r *EventService) FindByIdAndParticipantToken(eventId uint, participantToken string) (Event, error) {
+	return r.eventRepository.FindByIdAndParticipantToken(eventId, participantToken)
+}
