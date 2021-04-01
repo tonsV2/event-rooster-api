@@ -11,7 +11,7 @@ import (
 	"html/template"
 )
 
-var testEmails = []string{"test@mail.com", "test1@mail.com", "test2@mail.com"}
+var testEmails = []string{"test@mail.com", "test1@mail.com", "test2@mail.com", "test3@mail.com", "test4@mail.com"}
 
 func ProvideMailer(mailerConfiguration configurations.MailerConfiguration) Mailer {
 	templatePathPrefix := "./"
