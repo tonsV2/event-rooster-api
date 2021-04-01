@@ -61,7 +61,7 @@ func TestAddParticipantsCSVToEventByToken(t *testing.T) {
 
 			body := r.Body.String()
 
-			assert.Equal(t, "\"2 participants parsed\"", body)
+			assert.Equal(t, "\"3 participants parsed\"", body)
 			assert.Equal(t, http.StatusCreated, r.Code)
 		})
 }
