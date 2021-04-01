@@ -4,19 +4,35 @@ import (
 	"github.com/tonsV2/event-rooster-api/models"
 )
 
-type GroupDTO struct {
-	ID              uint   `json:"id,string,omitempty"`
-	Datetime        string `json:"datetime"`
-	MaxParticipants uint   `json:"maxParticipants"`
-}
-
 type CreateGroupDTO struct {
 	Datetime        string `json:"datetime" binding:"required"`
 	MaxParticipants uint   `json:"maxParticipants" binding:"required"`
 }
 
+type GroupDTO struct {
+	ID              uint             `json:"id,string,omitempty"`
+	Datetime        string           `json:"datetime"`
+	MaxParticipants uint             `json:"maxParticipants"`
+	Participants    []ParticipantDTO `json:"participants,omitempty"`
+}
+
 func ToGroupDTO(group models.Group) GroupDTO {
 	return GroupDTO{ID: group.ID, Datetime: group.Datetime, MaxParticipants: group.MaxParticipants}
+}
+
+func ToGroupWithParticipantsDTO(group models.Group) GroupDTO {
+	participantDtos := make([]ParticipantDTO, len(group.Participants))
+
+	for i, participant := range group.Participants {
+		participantDtos[i] = ToParticipantWithoutTokenDTO(participant)
+	}
+
+	return GroupDTO{
+		ID:              group.ID,
+		Datetime:        group.Datetime,
+		MaxParticipants: group.MaxParticipants,
+		Participants:    participantDtos,
+	}
 }
 
 type GroupWithParticipantsCountDTO struct {

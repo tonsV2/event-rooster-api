@@ -42,3 +42,7 @@ func (r *EventService) AddParticipantToEvent(event Event, participant Participan
 func (r *EventService) FindByIdAndParticipantToken(eventId uint, participantToken string) (Event, error) {
 	return r.eventRepository.FindByIdAndParticipantToken(eventId, participantToken)
 }
+
+func (r *EventService) FindEventWithGroupsAndParticipantsByToken(token string) (Event, error) {
+	return r.eventRepository.FindEventWithGroupsAndParticipantsByToken(token)
+}

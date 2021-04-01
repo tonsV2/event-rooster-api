@@ -71,3 +71,15 @@ func (e *EventController) AddGroupToEventByToken(c *gin.Context) {
 	groupDTO := dtos.ToGroupDTO(group)
 	c.JSON(http.StatusCreated, groupDTO)
 }
+
+func (e *EventController) GetEventWithGroupsAndParticipantsByToken(c *gin.Context) {
+	token := c.Query("token")
+
+	event, err := e.eventService.FindEventWithGroupsAndParticipantsByToken(token)
+	if err != nil {
+		handleError(c, err)
+	}
+
+	eventDTO := dtos.ToEventWithGroupsAndParticipantsDTO(event)
+	c.JSON(http.StatusOK, eventDTO)
+}

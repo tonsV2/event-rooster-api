@@ -43,3 +43,9 @@ func (p *EventRepository) FindByIdAndParticipantToken(eventId uint, participantT
 		return event, nil
 	}
 }
+
+func (p *EventRepository) FindEventWithGroupsAndParticipantsByToken(token string) (models.Event, error) {
+	var event models.Event
+	err := p.db.Preload("Groups.Participants").Find(&event, "token = ?", token).Error
+	return event, err
+}

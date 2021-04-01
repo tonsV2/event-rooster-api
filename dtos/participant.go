@@ -8,7 +8,7 @@ type ParticipantDTO struct {
 	ID    uint   `json:"id,string,omitempty"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
-	Token string `json:"token"`
+	Token string `json:"token,omitempty"`
 }
 
 type CreateParticipantDTO struct {
@@ -18,4 +18,8 @@ type CreateParticipantDTO struct {
 
 func ToParticipantDTO(participant models.Participant) ParticipantDTO {
 	return ParticipantDTO{ID: participant.ID, Name: participant.Name, Email: participant.Email, Token: participant.Token}
+}
+
+func ToParticipantWithoutTokenDTO(participant models.Participant) ParticipantDTO {
+	return ParticipantDTO{ID: participant.ID, Name: participant.Name, Email: participant.Email}
 }
