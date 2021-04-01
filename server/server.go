@@ -24,6 +24,7 @@ func initializeEventController(r *gin.Engine, eventController controllers.EventC
 	r.GET("/events/groups", eventController.FindEventWithGroupsByToken)
 	r.POST("/events/groups", eventController.AddGroupToEventByToken)
 	r.POST("/participants", participantController.AddParticipantToEventByToken)
+	r.POST("/participants/csv", participantController.AddParticipantsCSVToEventByToken)
 }
 
 func (s *Server) Run() {

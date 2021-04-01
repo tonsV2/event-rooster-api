@@ -9,6 +9,7 @@ import (
 	"github.com/tonsV2/event-rooster-api/models"
 	"github.com/tonsV2/event-rooster-api/repositories"
 	"github.com/tonsV2/event-rooster-api/services"
+	"io/ioutil"
 	"net/http"
 	"testing"
 )
@@ -123,6 +124,34 @@ func TestAddParticipantToEventByToken(t *testing.T) {
 
 			assert.Equal(t, expectedName, name.String())
 			assert.Equal(t, expectedEmail, email.String())
+			assert.Equal(t, http.StatusCreated, r.Code)
+		})
+}
+
+func TestAddParticipantsCSVToEventByToken(t *testing.T) {
+	r := gofight.New()
+
+	server := di.BuildServer()
+
+	eventService := getEventService()
+	createdEvent, _ := eventService.Create("title", "date", testEmail)
+
+	filename := "./testdata/participants.csv"
+	csvData, _ := ioutil.ReadFile(filename)
+
+	r.POST("/participants/csv").
+		SetQuery(gofight.H{"token": createdEvent.Token}).
+		SetFileFromPath([]gofight.UploadFile{
+			{
+				Name:    "file",
+				Content: csvData,
+			},
+		}).
+		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
+
+			body := r.Body.String()
+
+			assert.Equal(t, "\"3 participants parsed\"", body)
 			assert.Equal(t, http.StatusCreated, r.Code)
 		})
 }
