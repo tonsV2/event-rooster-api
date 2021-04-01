@@ -30,6 +30,7 @@ func initializeEventController(r *gin.Engine, eventController controllers.EventC
 
 	r.POST("/participants", participantController.AddParticipantToEventByToken)
 	r.POST("/participants/csv", participantController.AddParticipantsCSVToEventByToken)
+	r.POST("/participants/groups", participantController.AddParticipantToGroupByToken)
 
 	r.GET("/events/groups-count", groupController.GetGroupsWithParticipantsCountByEventIdAndParticipantToken)
 }

@@ -34,3 +34,13 @@ func (g *GroupRepository) FindGroupsWithParticipantsCountByEventId(id uint, grou
 		Group("group_id").
 		Scan(&groups).Error
 }
+
+func (g *GroupRepository) FindById(id string) (models.Group, error) {
+	var group models.Group
+	err := g.db.Find(&group, id).Error
+	return group, err
+}
+
+func (g *GroupRepository) AddParticipant(group models.Group, participant models.Participant) error {
+	return g.db.Model(&group).Association("Participants").Append([]*models.Participant{&participant})
+}

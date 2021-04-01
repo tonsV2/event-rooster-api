@@ -22,3 +22,9 @@ func (p *ParticipantRepository) FindByEmail(email string) (models.Participant, e
 	err := p.db.Find(&participant, "email = ?", email).Error
 	return participant, err
 }
+
+func (p *ParticipantRepository) FindByToken(token string) (models.Participant, error) {
+	var participant models.Participant
+	err := p.db.Find(&participant, "token = ?", token).Error
+	return participant, err
+}

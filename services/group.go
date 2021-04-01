@@ -24,3 +24,11 @@ func (g *GroupService) FindGroupsWithParticipantsCountByEventId(id uint) ([]Grou
 	err := g.groupRepository.FindGroupsWithParticipantsCountByEventId(id, &groups)
 	return groups, err
 }
+
+func (g *GroupService) FindById(id string) (Group, error) {
+	return g.groupRepository.FindById(id)
+}
+
+func (g *GroupService) AddParticipant(group Group, participant Participant) error {
+	return g.groupRepository.AddParticipant(group, participant)
+}

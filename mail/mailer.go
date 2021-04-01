@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"flag"
+	"fmt"
 	"github.com/tonsV2/event-rooster-api/configurations"
 	"github.com/tonsV2/event-rooster-api/models"
 	"gopkg.in/mail.v2"
@@ -91,6 +92,11 @@ func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buf
 		d.TLSConfig = &tls.Config{InsecureSkipVerify: false, ServerName: m.configuration.Host}
 		return d.DialAndSend(message)
 	}
+}
+
+func (m *Mailer) SendWelcomeToGroupMail(event models.Event, group models.Group, participant models.Participant) error {
+	fmt.Println("TODO: Send welcome to group mail")
+	return nil
 }
 
 func contains(s []string, str string) bool {

@@ -29,3 +29,7 @@ func (p *ParticipantService) CreateOrFind(name string, email string) (Participan
 	}
 	return participant, err
 }
+
+func (p *ParticipantService) FindByToken(token string) (Participant, error) {
+	return p.participantRepository.FindByToken(token)
+}

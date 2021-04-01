@@ -8,6 +8,7 @@ import (
 	"github.com/tonsV2/event-rooster-api/dtos"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"testing"
 )
 
@@ -15,6 +16,7 @@ func TestAddParticipantToEventByToken(t *testing.T) {
 	r := gofight.New()
 
 	server := di.BuildServer()
+
 	eventService := getEventService()
 	createdEvent, _ := eventService.Create("title", "date", testEmail)
 
@@ -62,6 +64,43 @@ func TestAddParticipantsCSVToEventByToken(t *testing.T) {
 			body := r.Body.String()
 
 			assert.Equal(t, "\"3 participants parsed\"", body)
+			assert.Equal(t, http.StatusCreated, r.Code)
+		})
+}
+
+func TestAddParticipantToGroupByToken(t *testing.T) {
+	r := gofight.New()
+
+	server := di.BuildServer()
+
+	eventService := getEventService()
+	event, _ := eventService.Create("title", "date", testEmail)
+
+	groupService := getGroupService()
+	group, _ := groupService.Create(event.ID, "datetime", 25)
+	groupId := strconv.Itoa(int(group.ID))
+
+	participantService := getParticipantService()
+	participant, _ := participantService.CreateOrFind("name", "test@mail.com")
+
+	_ = eventService.AddParticipantToEvent(event, participant)
+
+	r.POST("/participants/groups").
+		SetQuery(gofight.H{"id": groupId}).
+		SetQuery(gofight.H{"token": participant.Token}).
+		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
+
+			json := r.Body.String()
+
+			id := gjson.Get(json, "id")
+			name := gjson.Get(json, "name")
+			email := gjson.Get(json, "email")
+			token := gjson.Get(json, "token")
+
+			assert.Equal(t, participant.ID, uint(id.Uint()))
+			assert.Equal(t, participant.Name, name.String())
+			assert.Equal(t, participant.Email, email.String())
+			assert.Equal(t, participant.Token, token.String())
 			assert.Equal(t, http.StatusCreated, r.Code)
 		})
 }

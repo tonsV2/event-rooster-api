@@ -15,13 +15,14 @@ import (
 	"os"
 )
 
-func ProvideParticipantController(r services.EventService, p services.ParticipantService, m mail.Mailer) ParticipantController {
-	return ParticipantController{eventService: r, participantService: p, mailer: m}
+func ProvideParticipantController(r services.EventService, p services.ParticipantService, m mail.Mailer, g services.GroupService) ParticipantController {
+	return ParticipantController{eventService: r, participantService: p, mailer: m, groupService: g}
 }
 
 type ParticipantController struct {
 	eventService       services.EventService
 	participantService services.ParticipantService
+	groupService       services.GroupService
 	mailer             mail.Mailer
 }
 
@@ -116,4 +117,37 @@ func (p *ParticipantController) addParticipantToEvent(c *gin.Context, event mode
 	}
 
 	return participant
+}
+
+func (p *ParticipantController) AddParticipantToGroupByToken(c *gin.Context) {
+	token := c.Query("token")
+	groupId := c.Query("id")
+
+	participant, err := p.participantService.FindByToken(token)
+	if err != nil {
+		handleError(c, err) // TODO: 404
+	}
+
+	group, err := p.groupService.FindById(groupId)
+	if err != nil {
+		handleError(c, err) // TODO: 404
+	}
+
+	// Confirm participant is associated with event
+	event, err := p.eventService.FindByIdAndParticipantToken(group.EventID, token)
+	if err != nil {
+		handleError(c, err) // TODO: 404
+	}
+
+	err = p.groupService.AddParticipant(group, participant)
+	if err != nil {
+		handleError(c, err) // TODO: 404
+	}
+
+	if err := p.mailer.SendWelcomeToGroupMail(event, group, participant); err != nil {
+		handleError(c, err) // TODO: Mail error...
+	}
+
+	participantDTO := dtos.ToParticipantDTO(participant)
+	c.JSON(http.StatusCreated, participantDTO)
 }
