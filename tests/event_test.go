@@ -25,11 +25,11 @@ func TestCreateEvent(t *testing.T) {
 		SetJSONInterface(eventDTO).
 		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
 
-			data := []byte(r.Body.String())
+			json := r.Body.String()
 
-			title := gjson.GetBytes(data, "title")
-			date := gjson.GetBytes(data, "date")
-			email := gjson.GetBytes(data, "email")
+			title := gjson.Get(json, "title")
+			date := gjson.Get(json, "date")
+			email := gjson.Get(json, "email")
 
 			assert.Equal(t, expectedTitle, title.String())
 			assert.Equal(t, expectedDate, date.String())
@@ -55,11 +55,11 @@ func TestFindEventWithGroupsByToken(t *testing.T) {
 		SetQuery(gofight.H{"token": createdEvent.Token}).
 		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
 
-			data := []byte(r.Body.String())
+			json := r.Body.String()
 
-			title := gjson.GetBytes(data, "title")
-			date := gjson.GetBytes(data, "date")
-			groups := gjson.GetBytes(data, "groups")
+			title := gjson.Get(json, "title")
+			date := gjson.Get(json, "date")
+			groups := gjson.Get(json, "groups")
 
 			assert.Equal(t, expectedTitle, title.String())
 			assert.Equal(t, expectedDate, date.String())
@@ -84,10 +84,10 @@ func TestAddGroupToEventByToken(t *testing.T) {
 		SetJSONInterface(groupDTO).
 		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
 
-			data := []byte(r.Body.String())
+			json := r.Body.String()
 
-			datetime := gjson.GetBytes(data, "datetime")
-			maxParticipants := gjson.GetBytes(data, "maxParticipants")
+			datetime := gjson.Get(json, "datetime")
+			maxParticipants := gjson.Get(json, "maxParticipants")
 
 			assert.Equal(t, expectedDatetime, datetime.String())
 			assert.Equal(t, expectedMaxParticipants, uint(maxParticipants.Uint()))

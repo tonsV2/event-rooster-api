@@ -27,10 +27,10 @@ func TestAddParticipantToEventByToken(t *testing.T) {
 		SetJSONInterface(participantDTO).
 		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
 
-			data := []byte(r.Body.String())
+			json := r.Body.String()
 
-			name := gjson.GetBytes(data, "name")
-			email := gjson.GetBytes(data, "email")
+			name := gjson.Get(json, "name")
+			email := gjson.Get(json, "email")
 
 			assert.Equal(t, expectedName, name.String())
 			assert.Equal(t, expectedEmail, email.String())
