@@ -156,3 +156,45 @@ func TestGetEventWithGroupsAndParticipantsByToken(t *testing.T) {
 			assert.Equal(t, http.StatusOK, r.Code)
 		})
 }
+
+func TestFindEventParticipantsNotInAGroupByToken(t *testing.T) {
+	r := gofight.New()
+
+	server := di.BuildServer()
+
+	eventService := getEventService()
+	event, _ := eventService.Create("title", "date", testEmail)
+
+	groupService := getGroupService()
+	group0, _ := groupService.Create(event.ID, "datetime0", 25)
+
+	participantService := getParticipantService()
+	participant0, _ := participantService.CreateOrFind("name0", "test@mail.com")
+	participant1, _ := participantService.CreateOrFind("name1", "test1@mail.com")
+
+	_ = eventService.AddParticipantToEvent(event, participant0)
+	_ = eventService.AddParticipantToEvent(event, participant1)
+
+	_ = groupService.AddParticipant(group0, participant0)
+
+	r.GET("/participants/not-in-groups").
+		SetQuery(gofight.H{"token": event.Token}).
+		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
+
+			json := r.Body.String()
+
+			groupsLength := gjson.Get(json, "#")
+			assert.Equal(t, 1, int(groupsLength.Int()))
+
+			name := gjson.Get(json, "0.name")
+			assert.Equal(t, participant1.Name, name.String())
+
+			id := gjson.Get(json, "0.id")
+			assert.Equal(t, participant1.ID, uint(id.Uint()))
+
+			email := gjson.Get(json, "0.email")
+			assert.Equal(t, participant1.Email, email.String())
+
+			assert.Equal(t, http.StatusOK, r.Code)
+		})
+}
