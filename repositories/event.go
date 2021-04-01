@@ -20,18 +20,14 @@ func (p *EventRepository) Create(event *models.Event) error {
 
 func (p *EventRepository) FindEventWithGroupsByToken(token string) (models.Event, error) {
 	var event models.Event
-	if err := p.db.Preload("Groups").Where("token = ?", token).Find(&event).Error; err != nil {
-		return event, err
-	}
-	return event, nil
+	err := p.db.Preload("Groups").Where("token = ?", token).Find(&event).Error
+	return event, err
 }
 
 func (p *EventRepository) FindByToken(token string) (models.Event, error) {
 	var event models.Event
-	if err := p.db.Find(&event, "token = ?", token).Error; err != nil {
-		return event, err
-	}
-	return event, nil
+	err := p.db.Find(&event, "token = ?", token).Error
+	return event, err
 }
 
 func (p *EventRepository) AddParticipant(event models.Event, participant models.Participant) error {

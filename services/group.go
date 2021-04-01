@@ -22,9 +22,5 @@ func (g *GroupService) Create(eventId uint, datetime string, maxParticipants uin
 func (g *GroupService) FindGroupsWithParticipantsCountByEventId(id uint) ([]GroupWithParticipantsCount, error) {
 	var groups []GroupWithParticipantsCount
 	err := g.groupRepository.FindGroupsWithParticipantsCountByEventId(id, &groups)
-	if err != nil {
-		return groups, nil
-	} else {
-		return groups, err
-	}
+	return groups, err
 }
