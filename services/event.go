@@ -5,6 +5,7 @@ import (
 	"github.com/nu7hatch/gouuid"
 	. "github.com/tonsV2/event-rooster-api/models"
 	. "github.com/tonsV2/event-rooster-api/repositories"
+	"time"
 )
 
 type EventService struct {
@@ -15,7 +16,7 @@ func ProvideEventService(r EventRepository) EventService {
 	return EventService{eventRepository: r}
 }
 
-func (r *EventService) Create(title string, datetime string, email string) (Event, error) {
+func (r *EventService) Create(title string, datetime time.Time, email string) (Event, error) {
 	u4, err := uuid.NewV4()
 	if err != nil {
 		return Event{}, err

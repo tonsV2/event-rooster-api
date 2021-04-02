@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 )
 
 func TestAddParticipantToEventByToken(t *testing.T) {
@@ -18,7 +19,7 @@ func TestAddParticipantToEventByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	createdEvent, _ := eventService.Create("title", "datetime", testEmail)
+	createdEvent, _ := eventService.Create("title", time.Now(), testEmail)
 
 	expectedName := "name"
 	expectedEmail := "test@mail.com"
@@ -46,7 +47,7 @@ func TestAddParticipantsCSVToEventByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	createdEvent, _ := eventService.Create("title", "datetime", testEmail)
+	createdEvent, _ := eventService.Create("title", time.Now(), testEmail)
 
 	filename := "./testdata/participants.csv"
 	csvData, _ := ioutil.ReadFile(filename)
@@ -74,10 +75,10 @@ func TestAddParticipantToGroupByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	event, _ := eventService.Create("title", "datetime", testEmail)
+	event, _ := eventService.Create("title", time.Now(), testEmail)
 
 	groupService := getGroupService()
-	group, _ := groupService.Create(event.ID, "datetime", 25)
+	group, _ := groupService.Create(event.ID, time.Now(), 25)
 	groupId := strconv.Itoa(int(group.ID))
 
 	participantService := getParticipantService()

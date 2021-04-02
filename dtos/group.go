@@ -2,22 +2,24 @@ package dtos
 
 import (
 	"github.com/tonsV2/event-rooster-api/models"
+	"time"
 )
 
 type CreateGroupDTO struct {
-	Datetime        string `json:"datetime" binding:"required"`
-	MaxParticipants uint   `json:"maxParticipants" binding:"required"`
+	Datetime        time.Time `json:"datetime" binding:"required"`
+	MaxParticipants uint      `json:"maxParticipants" binding:"required"`
 }
 
 type GroupDTO struct {
 	ID              uint             `json:"id,string,omitempty"`
-	Datetime        string           `json:"datetime"`
+	Datetime        time.Time        `json:"datetime"`
 	MaxParticipants uint             `json:"maxParticipants"`
 	Participants    []ParticipantDTO `json:"participants,omitempty"`
+	CreatedAt       time.Time        `json:"createdAt"`
 }
 
 func ToGroupDTO(group models.Group) GroupDTO {
-	return GroupDTO{ID: group.ID, Datetime: group.Datetime, MaxParticipants: group.MaxParticipants}
+	return GroupDTO{ID: group.ID, Datetime: group.Datetime, MaxParticipants: group.MaxParticipants, CreatedAt: group.CreatedAt}
 }
 
 func ToGroupWithParticipantsDTO(group models.Group) GroupDTO {

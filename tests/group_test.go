@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 )
 
 func TestGetGroupsWithParticipantsCountByEventIdAndParticipantToken(t *testing.T) {
@@ -16,10 +17,10 @@ func TestGetGroupsWithParticipantsCountByEventIdAndParticipantToken(t *testing.T
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	event, _ := eventService.Create("title", "datetime", testEmail)
+	event, _ := eventService.Create("title", time.Now(), testEmail)
 
 	groupService := getGroupService()
-	datetime := "datetime"
+	datetime := time.Now()
 	actualMaxParticipants := uint(25)
 
 	group, _ := groupService.Create(event.ID, datetime, actualMaxParticipants)

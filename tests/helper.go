@@ -1,9 +1,11 @@
 package tests
 
 import (
+	"github.com/tidwall/gjson"
 	"github.com/tonsV2/event-rooster-api/models"
 	"github.com/tonsV2/event-rooster-api/repositories"
 	"github.com/tonsV2/event-rooster-api/services"
+	"time"
 )
 
 var testEmail = "test@mail.com"
@@ -27,4 +29,9 @@ func getParticipantService() services.ParticipantService {
 	participantRepository := repositories.ProvideParticipantRepository(db)
 	participantService := services.ProvideParticipantService(participantRepository)
 	return participantService
+}
+
+func CompareTimeToResult(mytime time.Time, result gjson.Result) bool {
+	parse, _ := time.Parse(time.RFC3339, result.String())
+	return mytime.Format(time.RFC3339) == parse.Format(time.RFC3339)
 }

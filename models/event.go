@@ -1,11 +1,14 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type Event struct {
 	gorm.Model
 	Title        string
-	Datetime     string
+	Datetime     time.Time
 	Email        string
 	Token        string        `gorm:"index;"`
 	Groups       []Group       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

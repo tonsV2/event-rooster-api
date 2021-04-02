@@ -1,11 +1,14 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type Group struct {
 	gorm.Model
 	EventID         uint
-	Datetime        string
+	Datetime        time.Time
 	MaxParticipants uint
 	Participants    []Participant `gorm:"many2many:participant_groups;"`
 }

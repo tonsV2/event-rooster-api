@@ -1,25 +1,28 @@
 package dtos
 
-import "github.com/tonsV2/event-rooster-api/models"
+import (
+	"github.com/tonsV2/event-rooster-api/models"
+	"time"
+)
 
 type EventDTO struct {
-	ID       uint   `json:"id,string,omitempty"`
-	Title    string `json:"title"`
-	Datetime string `json:"datetime"`
-	Email    string `json:"email"`
-	Token    string `json:"token,omitempty"`
+	ID       uint      `json:"id,string,omitempty"`
+	Title    string    `json:"title"`
+	Datetime time.Time `json:"datetime"`
+	Email    string    `json:"email"`
+	Token    string    `json:"token,omitempty"`
 }
 
 type CreateEventDTO struct {
-	Title    string `json:"title" binding:"required"`
-	Datetime string `json:"datetime" binding:"required"`
-	Email    string `json:"email" binding:"required"`
+	Title    string    `json:"title" binding:"required"`
+	Datetime time.Time `json:"datetime" binding:"required"`
+	Email    string    `json:"email" binding:"required"`
 }
 
 type EventWithGroupsDTO struct {
 	ID       uint       `json:"id,string,omitempty"`
 	Title    string     `json:"title"`
-	Datetime string     `json:"datetime"`
+	Datetime time.Time  `json:"datetime"`
 	Groups   []GroupDTO `json:"groups"`
 }
 

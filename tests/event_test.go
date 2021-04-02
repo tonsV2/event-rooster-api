@@ -8,6 +8,7 @@ import (
 	"github.com/tonsV2/event-rooster-api/dtos"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestCreateEvent(t *testing.T) {
@@ -16,7 +17,7 @@ func TestCreateEvent(t *testing.T) {
 	server := di.BuildServer()
 
 	expectedTitle := "title"
-	expectedDatetime := "datetime"
+	expectedDatetime := time.Now()
 	expectedEmail := testEmail
 
 	eventDTO := dtos.CreateEventDTO{Title: expectedTitle, Datetime: expectedDatetime, Email: expectedEmail}
@@ -32,7 +33,7 @@ func TestCreateEvent(t *testing.T) {
 			email := gjson.Get(json, "email")
 
 			assert.Equal(t, expectedTitle, title.String())
-			assert.Equal(t, expectedDatetime, datetime.String())
+			assert.True(t, CompareTimeToResult(expectedDatetime, datetime))
 			assert.Equal(t, expectedEmail, email.String())
 			assert.Equal(t, http.StatusCreated, r.Code)
 		})
@@ -46,7 +47,7 @@ func TestFindEventWithGroupsByToken(t *testing.T) {
 	eventService := getEventService()
 
 	expectedTitle := "title"
-	expectedDatetime := "datetime"
+	expectedDatetime := time.Now()
 	expectedEmail := testEmail
 
 	createdEvent, _ := eventService.Create(expectedTitle, expectedDatetime, expectedEmail)
@@ -62,7 +63,7 @@ func TestFindEventWithGroupsByToken(t *testing.T) {
 			groups := gjson.Get(json, "groups")
 
 			assert.Equal(t, expectedTitle, title.String())
-			assert.Equal(t, expectedDatetime, datetime.String())
+			assert.True(t, CompareTimeToResult(expectedDatetime, datetime))
 			assert.Equal(t, 0, len(groups.Array()))
 			assert.Equal(t, http.StatusOK, r.Code)
 		})
@@ -73,9 +74,9 @@ func TestAddGroupToEventByToken(t *testing.T) {
 
 	server := di.BuildServer()
 	eventService := getEventService()
-	createdEvent, _ := eventService.Create("title", "datetime", testEmail)
+	createdEvent, _ := eventService.Create("title", time.Now(), testEmail)
 
-	expectedDatetime := "datetime"
+	expectedDatetime := time.Now()
 	expectedMaxParticipants := uint(25)
 	groupDTO := dtos.CreateGroupDTO{Datetime: expectedDatetime, MaxParticipants: expectedMaxParticipants}
 
@@ -89,7 +90,7 @@ func TestAddGroupToEventByToken(t *testing.T) {
 			datetime := gjson.Get(json, "datetime")
 			maxParticipants := gjson.Get(json, "maxParticipants")
 
-			assert.Equal(t, expectedDatetime, datetime.String())
+			assert.True(t, CompareTimeToResult(expectedDatetime, datetime))
 			assert.Equal(t, expectedMaxParticipants, uint(maxParticipants.Uint()))
 			assert.Equal(t, http.StatusCreated, r.Code)
 		})
@@ -101,11 +102,11 @@ func TestGetEventWithGroupsAndParticipantsByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	event, _ := eventService.Create("title", "datetime", testEmail)
+	event, _ := eventService.Create("title", time.Now(), testEmail)
 
 	groupService := getGroupService()
-	group0, _ := groupService.Create(event.ID, "datetime0", 25)
-	group1, _ := groupService.Create(event.ID, "datetime1", 25)
+	group0, _ := groupService.Create(event.ID, time.Now(), 25)
+	group1, _ := groupService.Create(event.ID, time.Now(), 25)
 
 	participantService := getParticipantService()
 	participant0, _ := participantService.CreateOrFind("name0", "test@mail.com")
@@ -127,13 +128,13 @@ func TestGetEventWithGroupsAndParticipantsByToken(t *testing.T) {
 			json := r.Body.String()
 
 			datetime := gjson.Get(json, "datetime")
-			assert.Equal(t, event.Datetime, datetime.String())
+			assert.True(t, CompareTimeToResult(event.Datetime, datetime))
 
 			title := gjson.Get(json, "title")
 			assert.Equal(t, event.Title, title.String())
 
 			group0Datetime := gjson.Get(json, "groups.0.datetime")
-			assert.Equal(t, group0.Datetime, group0Datetime.String())
+			assert.True(t, CompareTimeToResult(group0.Datetime, group0Datetime))
 
 			group0MaxParticipants := gjson.Get(json, "groups.0.maxParticipants")
 			assert.Equal(t, group0.MaxParticipants, uint(group0MaxParticipants.Uint()))
@@ -163,10 +164,10 @@ func TestFindEventParticipantsNotInAGroupByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	event, _ := eventService.Create("title", "datetime", testEmail)
+	event, _ := eventService.Create("title", time.Now(), testEmail)
 
 	groupService := getGroupService()
-	group0, _ := groupService.Create(event.ID, "datetime0", 25)
+	group0, _ := groupService.Create(event.ID, time.Now(), 25)
 
 	participantService := getParticipantService()
 	participant0, _ := participantService.CreateOrFind("name0", "test@mail.com")
