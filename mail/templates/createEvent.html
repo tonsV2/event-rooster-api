@@ -3,15 +3,19 @@
     <body>
         <p>You created a new event: {{.Title}}</p>
 
-        <p>Using the below link you can add groups</p>
-        <br />
+        <p>
+            <h3>IMPORTANT!!!</h3>
+            <div>
+                <span>The links you'll find in this mail are personal which means that anyone with access to these links can make changes to your race!</span>
+                <br>
+                <span>Don't forward this mail to any of your participants. They will all receive mails about the event when you add them</span>
+            </div>
+        </p>
+
+        <p>Using the below link you can add groups and participants</p>
         <a href="http://localhost:8081/edit-event?token={{.Token}}">Edit event!</a>
 
-        <p>Using the below link you can upload a list of participants</p>
-        <br />
-        <a href="http://localhost:8081/edit-event?token={{.Token}}">Edit event!</a>
-
-        <p>Using the below link you can see participants</p>
+        <p>Using the below link you can see participants and which groups they are in</p>
         <br />
         <a href="http://localhost:8081/show-event?token={{.Token}}">Edit event!</a>
 
