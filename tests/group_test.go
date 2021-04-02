@@ -16,7 +16,7 @@ func TestGetGroupsWithParticipantsCountByEventIdAndParticipantToken(t *testing.T
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	event, _ := eventService.Create("title", "date", testEmail)
+	event, _ := eventService.Create("title", "datetime", testEmail)
 
 	groupService := getGroupService()
 	datetime := "datetime"

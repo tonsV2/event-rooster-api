@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 type Event struct {
 	gorm.Model
 	Title        string
-	Date         string
+	Datetime     string
 	Email        string
 	Token        string        `gorm:"index;"`
 	Groups       []Group       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`

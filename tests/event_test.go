@@ -16,10 +16,10 @@ func TestCreateEvent(t *testing.T) {
 	server := di.BuildServer()
 
 	expectedTitle := "title"
-	expectedDate := "date"
+	expectedDatetime := "datetime"
 	expectedEmail := testEmail
 
-	eventDTO := dtos.CreateEventDTO{Title: expectedTitle, Date: expectedDate, Email: expectedEmail}
+	eventDTO := dtos.CreateEventDTO{Title: expectedTitle, Datetime: expectedDatetime, Email: expectedEmail}
 
 	r.POST("/events").
 		SetJSONInterface(eventDTO).
@@ -28,11 +28,11 @@ func TestCreateEvent(t *testing.T) {
 			json := r.Body.String()
 
 			title := gjson.Get(json, "title")
-			date := gjson.Get(json, "date")
+			datetime := gjson.Get(json, "datetime")
 			email := gjson.Get(json, "email")
 
 			assert.Equal(t, expectedTitle, title.String())
-			assert.Equal(t, expectedDate, date.String())
+			assert.Equal(t, expectedDatetime, datetime.String())
 			assert.Equal(t, expectedEmail, email.String())
 			assert.Equal(t, http.StatusCreated, r.Code)
 		})
@@ -46,10 +46,10 @@ func TestFindEventWithGroupsByToken(t *testing.T) {
 	eventService := getEventService()
 
 	expectedTitle := "title"
-	expectedDate := "date"
+	expectedDatetime := "datetime"
 	expectedEmail := testEmail
 
-	createdEvent, _ := eventService.Create(expectedTitle, expectedDate, expectedEmail)
+	createdEvent, _ := eventService.Create(expectedTitle, expectedDatetime, expectedEmail)
 
 	r.GET("/events/groups").
 		SetQuery(gofight.H{"token": createdEvent.Token}).
@@ -58,11 +58,11 @@ func TestFindEventWithGroupsByToken(t *testing.T) {
 			json := r.Body.String()
 
 			title := gjson.Get(json, "title")
-			date := gjson.Get(json, "date")
+			datetime := gjson.Get(json, "datetime")
 			groups := gjson.Get(json, "groups")
 
 			assert.Equal(t, expectedTitle, title.String())
-			assert.Equal(t, expectedDate, date.String())
+			assert.Equal(t, expectedDatetime, datetime.String())
 			assert.Equal(t, 0, len(groups.Array()))
 			assert.Equal(t, http.StatusOK, r.Code)
 		})
@@ -73,7 +73,7 @@ func TestAddGroupToEventByToken(t *testing.T) {
 
 	server := di.BuildServer()
 	eventService := getEventService()
-	createdEvent, _ := eventService.Create("title", "date", testEmail)
+	createdEvent, _ := eventService.Create("title", "datetime", testEmail)
 
 	expectedDatetime := "datetime"
 	expectedMaxParticipants := uint(25)
@@ -101,7 +101,7 @@ func TestGetEventWithGroupsAndParticipantsByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	event, _ := eventService.Create("title", "date", testEmail)
+	event, _ := eventService.Create("title", "datetime", testEmail)
 
 	groupService := getGroupService()
 	group0, _ := groupService.Create(event.ID, "datetime0", 25)
@@ -126,8 +126,8 @@ func TestGetEventWithGroupsAndParticipantsByToken(t *testing.T) {
 
 			json := r.Body.String()
 
-			date := gjson.Get(json, "date")
-			assert.Equal(t, event.Date, date.String())
+			datetime := gjson.Get(json, "datetime")
+			assert.Equal(t, event.Datetime, datetime.String())
 
 			title := gjson.Get(json, "title")
 			assert.Equal(t, event.Title, title.String())
@@ -163,7 +163,7 @@ func TestFindEventParticipantsNotInAGroupByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	event, _ := eventService.Create("title", "date", testEmail)
+	event, _ := eventService.Create("title", "datetime", testEmail)
 
 	groupService := getGroupService()
 	group0, _ := groupService.Create(event.ID, "datetime0", 25)

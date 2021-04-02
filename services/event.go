@@ -15,14 +15,14 @@ func ProvideEventService(r EventRepository) EventService {
 	return EventService{eventRepository: r}
 }
 
-func (r *EventService) Create(title string, date string, email string) (Event, error) {
+func (r *EventService) Create(title string, datetime string, email string) (Event, error) {
 	u4, err := uuid.NewV4()
 	if err != nil {
 		return Event{}, err
 	}
 	token := fmt.Sprint(u4)
 
-	event := Event{Title: title, Date: date, Token: token, Email: email}
+	event := Event{Title: title, Datetime: datetime, Token: token, Email: email}
 	err = r.eventRepository.Create(&event)
 	return event, err
 }

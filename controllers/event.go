@@ -25,7 +25,7 @@ func (e *EventController) CreateEvent(c *gin.Context) {
 		handleError(c, err)
 	}
 
-	event, err := e.eventService.Create(input.Title, input.Date, input.Email)
+	event, err := e.eventService.Create(input.Title, input.Datetime, input.Email)
 	if err != nil {
 		handleError(c, err)
 	}

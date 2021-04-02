@@ -3,24 +3,24 @@ package dtos
 import "github.com/tonsV2/event-rooster-api/models"
 
 type EventDTO struct {
-	ID    uint   `json:"id,string,omitempty"`
-	Title string `json:"title"`
-	Date  string `json:"date"`
-	Email string `json:"email"`
-	Token string `json:"token"`
+	ID       uint   `json:"id,string,omitempty"`
+	Title    string `json:"title"`
+	Datetime string `json:"datetime"`
+	Email    string `json:"email"`
+	Token    string `json:"token,omitempty"`
 }
 
 type CreateEventDTO struct {
-	Title string `json:"title" binding:"required"`
-	Date  string `json:"date" binding:"required"`
-	Email string `json:"email" binding:"required"`
+	Title    string `json:"title" binding:"required"`
+	Datetime string `json:"datetime" binding:"required"`
+	Email    string `json:"email" binding:"required"`
 }
 
 type EventWithGroupsDTO struct {
-	ID     uint       `json:"id,string,omitempty"`
-	Title  string     `json:"title"`
-	Date   string     `json:"date"`
-	Groups []GroupDTO `json:"groups"`
+	ID       uint       `json:"id,string,omitempty"`
+	Title    string     `json:"title"`
+	Datetime string     `json:"datetime"`
+	Groups   []GroupDTO `json:"groups"`
 }
 
 func ToEventWithGroupsDTO(event models.Event) EventWithGroupsDTO {
@@ -30,7 +30,7 @@ func ToEventWithGroupsDTO(event models.Event) EventWithGroupsDTO {
 		groupDtos[i] = ToGroupDTO(group)
 	}
 
-	return EventWithGroupsDTO{ID: event.ID, Title: event.Title, Date: event.Date, Groups: groupDtos}
+	return EventWithGroupsDTO{ID: event.ID, Title: event.Title, Datetime: event.Datetime, Groups: groupDtos}
 }
 
 func ToEventWithGroupsAndParticipantsDTO(event models.Event) EventWithGroupsDTO {
@@ -40,9 +40,9 @@ func ToEventWithGroupsAndParticipantsDTO(event models.Event) EventWithGroupsDTO 
 		groupDtos[i] = ToGroupWithParticipantsDTO(group)
 	}
 
-	return EventWithGroupsDTO{ID: event.ID, Title: event.Title, Date: event.Date, Groups: groupDtos}
+	return EventWithGroupsDTO{ID: event.ID, Title: event.Title, Datetime: event.Datetime, Groups: groupDtos}
 }
 
 func ToEventDTO(event models.Event) EventDTO {
-	return EventDTO{ID: event.ID, Title: event.Title, Date: event.Date, Email: event.Email, Token: event.Token}
+	return EventDTO{ID: event.ID, Title: event.Title, Datetime: event.Datetime, Email: event.Email, Token: event.Token}
 }

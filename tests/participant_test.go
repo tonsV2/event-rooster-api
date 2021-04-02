@@ -18,7 +18,7 @@ func TestAddParticipantToEventByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	createdEvent, _ := eventService.Create("title", "date", testEmail)
+	createdEvent, _ := eventService.Create("title", "datetime", testEmail)
 
 	expectedName := "name"
 	expectedEmail := "test@mail.com"
@@ -46,7 +46,7 @@ func TestAddParticipantsCSVToEventByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	createdEvent, _ := eventService.Create("title", "date", testEmail)
+	createdEvent, _ := eventService.Create("title", "datetime", testEmail)
 
 	filename := "./testdata/participants.csv"
 	csvData, _ := ioutil.ReadFile(filename)
@@ -74,7 +74,7 @@ func TestAddParticipantToGroupByToken(t *testing.T) {
 	server := di.BuildServer()
 
 	eventService := getEventService()
-	event, _ := eventService.Create("title", "date", testEmail)
+	event, _ := eventService.Create("title", "datetime", testEmail)
 
 	groupService := getGroupService()
 	group, _ := groupService.Create(event.ID, "datetime", 25)
