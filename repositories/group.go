@@ -31,7 +31,7 @@ func (g *GroupRepository) FindGroupsWithParticipantsCountByEventId(id uint, grou
 		Select("id, max_participants, count(participant_id) as actual_participants").
 		Where("event_id = ?", id).
 		Joins("left join participant_groups pg on groups.id = pg.group_id").
-		Group("group_id").
+		Group("groups.id").
 		Scan(&groups).Error
 }
 
