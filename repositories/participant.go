@@ -19,12 +19,12 @@ func (p *ParticipantRepository) Create(participant *models.Participant) error {
 
 func (p *ParticipantRepository) FindByEmail(email string) (models.Participant, error) {
 	var participant models.Participant
-	err := p.db.Find(&participant, "email = ?", email).Error
+	err := p.db.First(&participant, "email = ?", email).Error
 	return participant, err
 }
 
 func (p *ParticipantRepository) FindByToken(token string) (models.Participant, error) {
 	var participant models.Participant
-	err := p.db.Find(&participant, "token = ?", token).Error
+	err := p.db.First(&participant, "token = ?", token).Error
 	return participant, err
 }

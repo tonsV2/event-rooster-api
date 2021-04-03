@@ -20,13 +20,13 @@ func (p *EventRepository) Create(event *models.Event) error {
 
 func (p *EventRepository) FindEventWithGroupsByToken(token string) (models.Event, error) {
 	var event models.Event
-	err := p.db.Preload("Groups").Where("token = ?", token).Find(&event).Error
+	err := p.db.Preload("Groups").Where("token = ?", token).First(&event).Error
 	return event, err
 }
 
 func (p *EventRepository) FindByToken(token string) (models.Event, error) {
 	var event models.Event
-	err := p.db.Find(&event, "token = ?", token).Error
+	err := p.db.First(&event, "token = ?", token).Error
 	return event, err
 }
 
@@ -36,7 +36,7 @@ func (p *EventRepository) AddParticipant(event models.Event, participant models.
 
 func (p *EventRepository) FindByIdAndParticipantToken(eventId uint, participantToken string) (models.Event, error) {
 	var event models.Event
-	p.db.Preload("Participants", "participants.token = ?", participantToken).Find(&event, eventId)
+	p.db.Preload("Participants", "participants.token = ?", participantToken).First(&event, eventId)
 	if len(event.Participants) < 1 {
 		return event, errors.New("participant not associated with event")
 	} else {
@@ -46,13 +46,13 @@ func (p *EventRepository) FindByIdAndParticipantToken(eventId uint, participantT
 
 func (p *EventRepository) FindEventWithGroupsAndParticipantsByToken(token string) (models.Event, error) {
 	var event models.Event
-	err := p.db.Preload("Groups.Participants").Find(&event, "token = ?", token).Error
+	err := p.db.Preload("Groups.Participants").First(&event, "token = ?", token).Error
 	return event, err
 }
 
 func (p *EventRepository) FindEventParticipantsNotInAGroupByToken(token string) ([]models.Participant, error) {
 	var event models.Event
-	err := p.db.Find(&event, "token = ?", token).Error
+	err := p.db.First(&event, "token = ?", token).Error
 
 	groupIds := p.db.
 		Model(&models.Group{}).
@@ -73,7 +73,7 @@ func (p *EventRepository) FindEventParticipantsNotInAGroupByToken(token string) 
 
 	err = p.db.
 		Preload("Participants", "id not in (?)", groupedParticipantIds).
-		Find(&event, event.ID).Error
+		First(&event, event.ID).Error
 
 	return event.Participants, err
 }

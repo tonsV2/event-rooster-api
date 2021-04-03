@@ -37,7 +37,7 @@ func (g *GroupRepository) FindGroupsWithParticipantsCountByEventId(id uint, grou
 
 func (g *GroupRepository) FindById(id string) (models.Group, error) {
 	var group models.Group
-	err := g.db.Find(&group, id).Error
+	err := g.db.First(&group, id).Error
 	return group, err
 }
 
