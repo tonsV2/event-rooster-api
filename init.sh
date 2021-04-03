@@ -15,13 +15,13 @@ export EVENT_TOKEN=$(echo '{
 # Create group
 echo '{
   "datetime": "2019-10-12T07:20:50.52Z",
-  "maxParticipants": 25
+  "maxParticipants": 2
 }' | http :8080/events/groups?token=$EVENT_TOKEN
 
 # Create another group
 echo '{
   "datetime": "2019-10-12T07:20:50.52Z",
-  "maxParticipants": 25
+  "maxParticipants": 2
 }' | http :8080/events/groups?token=$EVENT_TOKEN
 
 # Create participant
@@ -60,9 +60,6 @@ http post ":8080/participants/groups?groupId=1&token=$PARTICIPANT3_TOKEN"
 # Find groups with participant count
 http ":8080/events/groups-count?eventId=1&token=$PARTICIPANT_TOKEN"
 
-# Get event with groups and participants
-http ":8080/events?token=$EVENT_TOKEN"
-
 # Create fourth participant (which isn't in a group)
 export PARTICIPANT4_TOKEN=$(echo '{
   "name": "name4",
@@ -71,3 +68,21 @@ export PARTICIPANT4_TOKEN=$(echo '{
 
 # Get participants which aren't in any group
 http ":8080/participants/not-in-groups?token=$EVENT_TOKEN"
+
+# Add third participant to second group - This should remove it from the first group
+http post ":8080/participants/groups?groupId=2&token=$PARTICIPANT3_TOKEN"
+
+# Add third participant to second group again - This should result in an error because the group is full
+http post ":8080/participants/groups?groupId=2&token=$PARTICIPANT3_TOKEN"
+
+# Get event with groups and participants
+http ":8080/events?token=$EVENT_TOKEN"
+
+
+echo "Convenience links"
+echo "http://localhost:8081/show-event?token=$EVENT_TOKEN"
+echo "http://localhost:8081/edit-event?token=$EVENT_TOKEN"
+echo "4th participant join group"
+echo "http://localhost:8081/join-group?eventId=1&token=$PARTICIPANT4_TOKEN"
+echo "3th participant join group"
+echo "http://localhost:8081/join-group?eventId=1&token=$PARTICIPANT3_TOKEN"
