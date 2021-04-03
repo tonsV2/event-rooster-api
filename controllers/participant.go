@@ -122,7 +122,7 @@ func (p *ParticipantController) addParticipantToEvent(c *gin.Context, event mode
 
 func (p *ParticipantController) AddParticipantToGroupByToken(c *gin.Context) {
 	token := c.Query("token")
-	groupId := c.Query("id")
+	groupId := c.Query("groupId")
 
 	participant, err := p.participantService.FindByToken(token)
 	if err != nil {

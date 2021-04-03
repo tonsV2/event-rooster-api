@@ -92,7 +92,7 @@ func TestAddParticipantToGroupByToken(t *testing.T) {
 	_ = eventService.AddParticipantToEvent(event, participant)
 
 	r.POST("/participants/groups").
-		SetQuery(gofight.H{"id": groupId}).
+		SetQuery(gofight.H{"groupId": groupId}).
 		SetQuery(gofight.H{"token": participant.Token}).
 		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
 
