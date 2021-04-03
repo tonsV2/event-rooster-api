@@ -31,12 +31,12 @@ func (p *ParticipantController) AddParticipantToEventByToken(c *gin.Context) {
 
 	var input dtos.CreateParticipantDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
-		handleError(c, err)
+		handleErrorWithMessage(c, http.StatusBadRequest, err, ParseDtoFail)
 	}
 
 	event, err := p.eventService.FindByToken(token)
 	if err != nil {
-		handleError(c, err) // TODO: 404
+		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
 	participant := p.addParticipantToEvent(c, event, input.Name, input.Email)
@@ -50,27 +50,27 @@ func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context)
 
 	event, err := p.eventService.FindByToken(token)
 	if err != nil {
-		handleError(c, err) // TODO: 404
+		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		handleError(c, err)
+		handleError(c, http.StatusInternalServerError, err)
 	}
 
 	u4, err := uuid.NewV4()
 	if err != nil {
-		handleError(c, err)
+		handleError(c, http.StatusInternalServerError, err)
 	}
 	newFileName := "/tmp/" + fmt.Sprint(u4)
 
 	if err := c.SaveUploadedFile(file, newFileName); err != nil {
-		handleError(c, err)
+		handleError(c, http.StatusInternalServerError, err)
 	}
 
 	in, err := os.Open(newFileName)
 	if err != nil {
-		handleError(c, err)
+		handleError(c, http.StatusInternalServerError, err)
 	}
 
 	r := csv.NewReader(in)
@@ -95,7 +95,7 @@ func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context)
 	}
 
 	if err := os.Remove(newFileName); err != nil {
-		handleError(c, err)
+		handleError(c, http.StatusInternalServerError, err)
 	}
 
 	c.JSON(http.StatusCreated, fmt.Sprintf("%d participants parsed", count))
@@ -104,17 +104,17 @@ func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context)
 func (p *ParticipantController) addParticipantToEvent(c *gin.Context, event models.Event, name string, email string) models.Participant {
 	participant, err := p.participantService.CreateOrFind(name, email)
 	if err != nil {
-		handleError(c, err) // TODO: idk?
+		handleError(c, http.StatusBadRequest, err)
 	}
 
 	err = p.eventService.AddParticipantToEvent(event, participant)
 	if err != nil {
-		handleError(c, err) // TODO: idk?
+		handleError(c, http.StatusBadRequest, err)
 	}
 
 	// TODO: Don't send mail if participant already added to event
 	if err := p.mailer.SendWelcomeParticipantMail(event, participant); err != nil {
-		handleError(c, err) // TODO: Mail error...
+		handleError(c, http.StatusBadRequest, err)
 	}
 
 	return participant
@@ -126,27 +126,27 @@ func (p *ParticipantController) AddParticipantToGroupByToken(c *gin.Context) {
 
 	participant, err := p.participantService.FindByToken(token)
 	if err != nil {
-		handleError(c, err) // TODO: 404
+		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
 	group, err := p.groupService.FindById(groupId)
 	if err != nil {
-		handleError(c, err) // TODO: 404
+		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
 	// Confirm participant is associated with event
 	event, err := p.eventService.FindByIdAndParticipantToken(group.EventID, token)
 	if err != nil {
-		handleError(c, err) // TODO: 404
+		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
 	err = p.groupService.AddParticipant(group, participant)
 	if err != nil {
-		handleError(c, err) // TODO: 404
+		handleError(c, http.StatusBadRequest, err)
 	}
 
 	if err := p.mailer.SendWelcomeToGroupMail(event, group, participant); err != nil {
-		handleError(c, err) // TODO: Mail error...
+		handleError(c, http.StatusBadRequest, err)
 	}
 
 	participantDTO := dtos.ToParticipantDTO(participant)

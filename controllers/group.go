@@ -21,19 +21,19 @@ func (g GroupController) GetGroupsWithParticipantsCountByEventIdAndParticipantTo
 	eventIdStr := c.Query("id")
 	eventId, err := strconv.ParseUint(eventIdStr, 10, 64)
 	if err != nil {
-		handleError(c, err) // TODO: id not valid
+		handleErrorWithMessage(c, http.StatusBadRequest, err, "Unable to parse id")
 	}
 
 	participantToken := c.Query("token")
 
 	event, err := g.eventService.FindByIdAndParticipantToken(uint(eventId), participantToken)
 	if err != nil {
-		handleError(c, err) // TODO: 404
+		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
 	groupsWithParticipantsCount, err := g.groupService.FindGroupsWithParticipantsCountByEventId(event.ID)
 	if err != nil {
-		handleError(c, err) // TODO: 404
+		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
 	groupsDto := dtos.ToGroupsWithParticipantsCountDTO(groupsWithParticipantsCount)
