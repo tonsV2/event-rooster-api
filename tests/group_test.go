@@ -32,8 +32,8 @@ func TestGetGroupsWithParticipantsCountByEventIdAndParticipantToken(t *testing.T
 
 	r.GET("/events/groups-count").
 		SetQuery(gofight.H{
-			"id":    strconv.Itoa(int(event.ID)),
-			"token": participant.Token},
+			"eventId": strconv.Itoa(int(event.ID)),
+			"token":   participant.Token},
 		).
 		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
 			json := r.Body.String()

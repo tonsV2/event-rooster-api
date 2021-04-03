@@ -18,7 +18,7 @@ type GroupController struct {
 }
 
 func (g GroupController) GetGroupsWithParticipantsCountByEventIdAndParticipantToken(c *gin.Context) {
-	eventIdStr := c.Query("id")
+	eventIdStr := c.Query("eventId")
 	eventId, err := strconv.ParseUint(eventIdStr, 10, 64)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusBadRequest, err, "Unable to parse id")
