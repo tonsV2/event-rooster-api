@@ -31,5 +31,21 @@ func (g *GroupService) FindById(id string) (Group, error) {
 }
 
 func (g *GroupService) AddParticipant(group Group, participant Participant) error {
-	return g.groupRepository.AddParticipant(group, participant)
+	groups, _ := g.groupRepository.FindParticipantGroups(group, participant)
+
+	if len(groups) > 1 {
+		panic("Participant in more than one group")
+	}
+
+	if len(groups) > 0 && groups[0].ID == group.ID {
+		return nil
+	}
+
+	err := g.groupRepository.AddParticipant(group, participant)
+
+	if len(groups) > 0 {
+		return g.groupRepository.RemoveParticipant(groups[0], participant)
+	}
+
+	return err
 }

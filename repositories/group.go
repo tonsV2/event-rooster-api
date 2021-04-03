@@ -44,3 +44,27 @@ func (g *GroupRepository) FindById(id string) (models.Group, error) {
 func (g *GroupRepository) AddParticipant(group models.Group, participant models.Participant) error {
 	return g.db.Model(&group).Association("Participants").Append([]*models.Participant{&participant})
 }
+
+func (g *GroupRepository) RemoveParticipant(group models.Group, participant models.Participant) error {
+	return g.db.Model(&group).Association("Participants").Delete([]*models.Participant{&participant})
+}
+
+func (g *GroupRepository) FindParticipantGroups(group models.Group, participant models.Participant) ([]models.Group, error) {
+	eventGroupIds := g.db.
+		Model(&models.Group{}).
+		Select("id").
+		Where("event_id = ?", group.EventID)
+
+	participantGroupIds := g.db.
+		Table("participant_groups").
+		Select("group_id").
+		Where("participant_id = ? and group_id in (?)", participant.ID, eventGroupIds)
+
+	var groups []models.Group
+	err := g.db.
+		Model(&models.Group{}).
+		Where("id in (?)", participantGroupIds).
+		Find(&groups).Error
+
+	return groups, err
+}
