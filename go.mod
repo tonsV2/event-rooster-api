@@ -1,6 +1,6 @@
 module github.com/tonsV2/event-rooster-api
 
-go 1.15
+go 1.16
 
 require (
 	github.com/appleboy/gofight/v2 v2.1.2
