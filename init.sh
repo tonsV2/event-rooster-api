@@ -31,10 +31,10 @@ export PARTICIPANT_TOKEN=$(echo '{
 }' | http :8080/participants?token=$EVENT_TOKEN | jq -r '.token')
 
 # Find groups with participant count
-http ":8080/events/groups-count?id=1&token=$PARTICIPANT_TOKEN"
+http ":8080/events/groups-count?eventId=1&token=$PARTICIPANT_TOKEN"
 
 # Add participant to group
-http post ":8080/participants/groups?id=&token=$PARTICIPANT_TOKEN"
+http post ":8080/participants/groups?groupId=1&token=$PARTICIPANT_TOKEN"
 
 # Create second participant
 export PARTICIPANT2_TOKEN=$(echo '{
@@ -43,10 +43,10 @@ export PARTICIPANT2_TOKEN=$(echo '{
 }' | http :8080/participants?token=$EVENT_TOKEN | jq -r '.token')
 
 # Add second participant to second group
-http post ":8080/participants/groups?id=2&token=$PARTICIPANT2_TOKEN"
+http post ":8080/participants/groups?groupId=2&token=$PARTICIPANT2_TOKEN"
 
 # Find groups with participant count
-http ":8080/events/groups-count?id=1&token=$PARTICIPANT_TOKEN"
+http ":8080/events/groups-count?eventId=1&token=$PARTICIPANT_TOKEN"
 
 # Create third participant
 export PARTICIPANT3_TOKEN=$(echo '{
@@ -55,10 +55,10 @@ export PARTICIPANT3_TOKEN=$(echo '{
 }' | http :8080/participants?token=$EVENT_TOKEN | jq -r '.token')
 
 # Add third participant to first group
-http post ":8080/participants/groups?id=1&token=$PARTICIPANT3_TOKEN"
+http post ":8080/participants/groups?groupId=1&token=$PARTICIPANT3_TOKEN"
 
 # Find groups with participant count
-http ":8080/events/groups-count?id=1&token=$PARTICIPANT_TOKEN"
+http ":8080/events/groups-count?eventId=1&token=$PARTICIPANT_TOKEN"
 
 # Get event with groups and participants
 http ":8080/events?token=$EVENT_TOKEN"
