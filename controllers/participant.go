@@ -112,6 +112,7 @@ func (p *ParticipantController) addParticipantToEvent(c *gin.Context, event mode
 		handleError(c, err) // TODO: idk?
 	}
 
+	// TODO: Don't send mail if participant already added to event
 	if err := p.mailer.SendWelcomeParticipantMail(event, participant); err != nil {
 		handleError(c, err) // TODO: Mail error...
 	}
