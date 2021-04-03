@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/nu7hatch/gouuid"
@@ -140,6 +141,10 @@ func (p *ParticipantController) AddParticipantToGroupByToken(c *gin.Context) {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
+	if p.isGroupFull(event, group.ID) {
+		handleError(c, http.StatusForbidden, errors.New("group is full"))
+	}
+
 	err = p.groupService.AddParticipant(group, participant)
 	if err != nil {
 		handleError(c, http.StatusBadRequest, err)
@@ -151,4 +156,19 @@ func (p *ParticipantController) AddParticipantToGroupByToken(c *gin.Context) {
 
 	participantDTO := dtos.ToParticipantDTO(participant)
 	c.JSON(http.StatusCreated, participantDTO)
+}
+
+func (p *ParticipantController) isGroupFull(event models.Event, groupId uint) bool {
+	groupParticipantsCounts, err := p.groupService.FindGroupsWithParticipantsCountByEventId(event.ID)
+	if err != nil {
+		panic(err.Error())
+	}
+	for _, group := range groupParticipantsCounts {
+		if group.ID == groupId {
+			maxParticipants := group.MaxParticipants
+			actualParticipants := group.ActualParticipants
+			return !(maxParticipants > actualParticipants)
+		}
+	}
+	panic(errors.New("no matching group found"))
 }
