@@ -51,6 +51,9 @@ jobs:
 
       - name: Smoke test Docker image
         run: |
+          export GIN_MODE=debug
+          export DATABASE_DSN=/tmp/test.db
+
           docker-compose up -d prod
           sleep 5
 
