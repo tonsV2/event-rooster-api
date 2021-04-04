@@ -6,7 +6,6 @@ services:
     ports:
       - 8080:8080
     environment:
-      GIN_MODE: release
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
