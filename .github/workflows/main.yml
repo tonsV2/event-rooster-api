@@ -131,6 +131,12 @@ jobs:
           mkdir /home/runner/.kube
           echo "${{ secrets.KUBECONFIG }}" > /home/runner/.kube/config
 
+      - name: Configure .env file for development environment
+        run: |
+          echo "${{ secrets.DOTENV_DEVELOPMENT }}" > .env
+          export $(grep -v '^#' .env | xargs -0)
+          rm .env
+
       - name: Deploy to Development
         if: github.ref == 'refs/heads/master'
         run: |
