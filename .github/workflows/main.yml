@@ -51,11 +51,17 @@ jobs:
 
       - name: Smoke test Docker image
         run: |
-          export GIN_MODE=debug
-          export DATABASE_DSN=/tmp/test.db
-
           docker-compose up -d prod
           sleep 5
+          docker-compose logs prod
+        env:
+          GIN_MODE: debug
+          DATABASE_DSN: /tmp/test.db
+
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
 
       - name: Confirm /health returns 200
         run: |
