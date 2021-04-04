@@ -66,3 +66,7 @@ releases:
 
 helmDefaults:
   recreatePods: true
+
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
