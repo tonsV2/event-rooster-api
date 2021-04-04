@@ -11,6 +11,7 @@ type Server struct {
 }
 
 func ProvideServer(
+	healthController controllers.HealthController,
 	eventController controllers.EventController,
 	participantController controllers.ParticipantController,
 	groupController controllers.GroupController) Server {
@@ -18,12 +19,20 @@ func ProvideServer(
 	r := gin.Default()
 	r.Use(cors.Default())
 
-	initializeEventController(r, eventController, participantController, groupController)
+	initializeEventController(r, healthController, eventController, participantController, groupController)
 
 	return Server{Engine: r}
 }
 
-func initializeEventController(r *gin.Engine, eventController controllers.EventController, participantController controllers.ParticipantController, groupController controllers.GroupController) {
+func initializeEventController(r *gin.Engine,
+	healthController controllers.HealthController,
+	eventController controllers.EventController,
+	participantController controllers.ParticipantController,
+	groupController controllers.GroupController) {
+
+	r.GET("/health", healthController.GetHealthStatus)
+	r.GET("/", healthController.GetHealthStatus)
+
 	r.POST("/events", eventController.CreateEvent)
 	r.GET("/events", eventController.GetEventWithGroupsAndParticipantsByToken)
 	r.GET("/events/groups", eventController.FindEventWithGroupsByToken)

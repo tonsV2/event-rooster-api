@@ -16,6 +16,7 @@ import (
 func BuildServer() server.Server {
 	wire.Build(
 		server.ProvideServer,
+		controllers.ProvideHealthController,
 		models.ProvideDatabase,
 		configurations.ProvideMailerConfiguration, mail.ProvideMailer,
 		repositories.ProvideEventRepository, services.ProvideEventService, controllers.ProvideEventController,

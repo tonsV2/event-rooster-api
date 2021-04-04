@@ -18,6 +18,7 @@ import (
 // Injectors from wire.go:
 
 func BuildServer() server.Server {
+	healthController := controllers.ProvideHealthController()
 	db := models.ProvideDatabase()
 	eventRepository := repositories.ProvideEventRepository(db)
 	eventService := services.ProvideEventService(eventRepository)
@@ -30,6 +31,6 @@ func BuildServer() server.Server {
 	participantService := services.ProvideParticipantService(participantRepository)
 	participantController := controllers.ProvideParticipantController(eventService, participantService, mailer, groupService)
 	groupController := controllers.ProvideGroupController(eventService, groupService)
-	serverServer := server.ProvideServer(eventController, participantController, groupController)
+	serverServer := server.ProvideServer(healthController, eventController, participantController, groupController)
 	return serverServer
 }
