@@ -25,6 +25,7 @@ jobs:
 
       - name: Run tests
         run: |
+          touch .env
           docker-compose build test
           docker-compose run test
 
