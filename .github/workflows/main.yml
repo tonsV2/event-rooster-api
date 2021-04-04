@@ -51,7 +51,7 @@ jobs:
 
       - name: Configure smoke test .env file
         run: |
-          echo "${{ secrets.SMOKE_TEST_DOTENV }}" > .env
+          echo "${{ secrets.DOTENV_SMOKE_TEST }}" > .env
 
       - name: Smoke test Docker image
         run: |
@@ -131,6 +131,7 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > /home/runner/.kube/config
 
       - name: Configure .env file for development environment
+        if: github.ref == 'refs/heads/master'
         run: |
           echo "${{ secrets.DOTENV_DEVELOPMENT }}" > .env
           export $(grep -v '^#' .env | xargs -0)
@@ -141,6 +142,13 @@ jobs:
         run: |
           FEATURE_TAG="-" helmfile -e dev sync --set image.pullPolicy=Always
           echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+
+      - name: Configure .env file for production environment
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "${{ secrets.DOTENV_PRODUCTION }}" > .env
+          export $(grep -v '^#' .env | xargs -0)
+          rm .env
 
       - name: Deploy to Production
         if: startsWith(github.ref, 'refs/tags/v')
