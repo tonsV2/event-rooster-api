@@ -158,6 +158,10 @@ jobs:
 
       - name: Smoke test deployment
         run: |
+          echo "${{ secrets.DOTENV_DEVELOPMENT }}" > .env
+          export $(grep -v '^#' .env | xargs -0)
+          rm .env
+
           URL=$(FEATURE_TAG="${{ env.VERSION }}" helmfile -e ${{ env.ENVIRONMENT }} template | yq e '.spec.rules[0].host' - | sed s/null// | sed s/---// | tr -d '\n')
           sleep 10
           curl --fail --insecure --location --max-time 10 "$URL/health" | jq -e '.Status | test("UP")'
