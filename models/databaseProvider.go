@@ -30,7 +30,6 @@ func ProvideDatabase() *gorm.DB {
 }
 
 func providePostgresDatabase() *gorm.DB {
-	// TODO: Maybe use configurations.requireEnv here? Maybe not... Should this package depend on the configurations package?
 	host, _ := os.LookupEnv("DATABASE_HOST")
 	port, _ := os.LookupEnv("DATABASE_PORT")
 	username, _ := os.LookupEnv("DATABASE_USERNAME")
@@ -53,11 +52,16 @@ func providePostgresDatabase() *gorm.DB {
 }
 
 func provideSqliteDatabase() *gorm.DB {
+	dsn, ok := os.LookupEnv("DATABASE_DSN")
+	if !ok {
+		dsn = "./test.db"
+	}
+
 	config := gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	}
 
-	database, err := gorm.Open(sqlite.Open("test.db"), &config)
+	database, err := gorm.Open(sqlite.Open(dsn), &config)
 
 	if err != nil {
 		panic("Failed to connect to database!")
