@@ -40,7 +40,7 @@ releases:
       - environmentVariables:
           GIN_MODE: release
 
-          DATABASE_HOST: event-rooster-database-postgresql-headless
+          DATABASE_HOST: {{ requiredEnv "DATABASE_HOST" }}
           DATABASE_PORT: {{ requiredEnv "DATABASE_PORT" }}
           DATABASE_USERNAME: {{ requiredEnv "DATABASE_USERNAME" }}
           DATABASE_PASSWORD: {{ requiredEnv "DATABASE_PASSWORD" }}
