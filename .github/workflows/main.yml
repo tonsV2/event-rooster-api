@@ -1,0 +1,149 @@
+name: Docker image creation
+
+on:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+      - master
+      - release
+      - feature/**
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+  # Run tests for any PRs.
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          docker-compose build test
+          docker-compose run test
+
+      - name: Find version
+        run: |
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          # Export
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+          echo "VERSION=$VERSION"
+
+      - name: Build image
+        run: |
+          docker-compose build prod
+
+      - name: Smoke test Docker image
+        run: |
+          docker-compose up -d prod
+          sleep 5
+
+      - name: Confirm /health returns 200
+        run: |
+          curl --fail localhost:8080/health
+
+      - name: Confirm process isn't running as root
+        run: |
+          USER=$(docker-compose exec -T prod whoami)
+          [ "$USER" != "root" ]
+
+      - name: Confirm process is running as pid 1
+        run: |
+          # TODO: Don't hardcode application name
+          PID=$(docker-compose exec -T prod pgrep event-rooster-api)
+          [ "$PID" == "1" ]
+
+      - name: End smoke test
+        run: |
+          docker-compose down
+
+      - name: Log into registry
+        run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Setup yq
+        run: |
+          sudo snap install --channel=v4 yq
+
+      - name: Push image
+        run: |
+          IMAGE_NAME=$(yq e '.services.prod.image' docker-compose.yml)
+          VERSION="${{ env.VERSION }}"
+          docker tag $IMAGE_NAME $IMAGE_NAME:$VERSION
+          docker push $IMAGE_NAME:$VERSION
+
+      - name: Update chart image tag
+        run: |
+          yq -i e ".image.tag = \"${{ env.VERSION }}\"" helm/values.yaml
+
+      - name: Update chart version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          yq -i e ".version = \"${{ env.VERSION }}\"" helm/Chart.yaml
+
+      - name: Update chart app version
+        run: |
+          yq -i e ".appVersion = \"${{ env.VERSION }}\"" helm/Chart.yaml
+
+      - name: Lint Helm
+        uses: WyriHaximus/github-action-helm3@v2
+        with:
+          exec: helm lint helm/
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Test chart
+        run: |
+          echo "TODO"
+
+      - name: Push chart
+        run: |
+          echo "TODO"
+
+      - name: Setup helmfile
+        uses: mamezou-tech/setup-helmfile@v0.7.0
+
+      - name: Configure kubectl
+        run: |
+          mkdir /home/runner/.kube
+          echo "${{ secrets.KUBECONFIG }}" > /home/runner/.kube/config
+
+      - name: Deploy to Development
+        if: github.ref == 'refs/heads/master'
+        run: |
+          FEATURE_TAG="-" helmfile -e dev sync --set image.pullPolicy=Always
+          echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+
+      - name: Deploy to Production
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          FEATURE_TAG="-" helmfile -e prod sync
+          echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+
+      - name: Deploy Feature Branch
+        if: startsWith(github.ref, 'refs/heads/feature/')
+        run: |
+          FEATURE_TAG="${{ env.VERSION }}" helmfile -e feature sync --set image.pullPolicy=Always
+          echo "ENVIRONMENT=feature" >> $GITHUB_ENV
+
+      - name: Smoke test deployment
+        run: |
+          URL=$(FEATURE_TAG="${{ env.VERSION }}" helmfile -e ${{ env.ENVIRONMENT }} template | yq e '.spec.rules[0].host' - | sed s/null// | sed s/---// | tr -d '\n')
+          sleep 10
+          curl --fail --insecure --location --max-time 10 "$URL/health" | jq -e '.Status | test("UP")'
