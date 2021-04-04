@@ -1,0 +1,68 @@
+environments:
+  dev:
+    values:
+      - kubeContext: nuc
+      - name: event-rooster-api
+      - host: event-rooster.api.dev.fitfit.dk
+      - certIssuer: letsencrypt-staging
+      - replicaCount: 1
+      - postgresVersion: 10.1.1
+
+  prod:
+    values:
+      - kubeContext: nuc
+      - name: event-rooster-api
+      - host: event-rooster.api.fitfit.dk
+      - certIssuer: letsencrypt-prod
+      - replicaCount: 2
+      - postgresVersion: 10.1.1
+
+  feature:
+    values:
+      - kubeContext: nuc
+      - name: event-rooster-api-{{ .Environment.Name }}-{{ requiredEnv "FEATURE_TAG" }}
+      - host: event-rooster-{{ requiredEnv "FEATURE_TAG" }}.api.fitfit.dk
+      - certIssuer: letsencrypt-staging
+      - replicaCount: 1
+      - postgresVersion: 10.1.1
+
+releases:
+  - name: "{{ .Values.name }}"
+    namespace: event-rooster-{{ .Environment.Name }}
+    chart: helm/
+    kubeContext: "{{ .Values.kubeContext }}"
+    values:
+      - ingress:
+          enabled: true
+          hostname: {{ .Values.host }}
+          certIssuer: {{ .Values.certIssuer }}
+      - replicaCount: {{ .Values.replicaCount }}
+      - environmentVariables:
+          GIN_MODE: release
+
+          DATABASE_HOST: event-rooster-database-postgresql-headless
+          DATABASE_PORT: {{ requiredEnv "DATABASE_PORT" }}
+          DATABASE_USERNAME: {{ requiredEnv "DATABASE_USERNAME" }}
+          DATABASE_PASSWORD: {{ requiredEnv "DATABASE_PASSWORD" }}
+          DATABASE_NAME: {{ requiredEnv "DATABASE_NAME" }}
+
+          SMTP_HOST: {{ requiredEnv "SMTP_HOST" }}
+          SMTP_PORT: {{ requiredEnv "SMTP_PORT" }}
+          SMTP_USERNAME: {{ requiredEnv "SMTP_USERNAME" }}
+          SMTP_PASSWORD: {{ requiredEnv "SMTP_PASSWORD" }}
+
+  - name: event-rooster-database
+    namespace: event-rooster-{{ .Environment.Name }}
+    chart: bitnami/postgresql
+    verify: false
+    version: "{{ .Values.postgresVersion }}"
+    kubeContext: "{{ .Values.kubeContext }}"
+    values:
+      - postgresqlUsername: {{ requiredEnv "DATABASE_USERNAME" }}
+      - postgresqlPassword: {{ requiredEnv "DATABASE_PASSWORD" }}
+      - postgresqlDatabase: {{ requiredEnv "DATABASE_NAME" }}
+      - persistence:
+          size: 1Gi
+
+helmDefaults:
+  recreatePods: true
