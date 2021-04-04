@@ -55,7 +55,6 @@ jobs:
 
       - name: Smoke test Docker image
         run: |
-          env
           docker-compose up -d prod
           sleep 5
           docker-compose logs prod
