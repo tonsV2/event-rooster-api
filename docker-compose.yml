@@ -23,6 +23,11 @@ services:
       - .:/src
     working_dir: /src
     command: /bin/sh -c 'go test -v ./tests'
+    environment:
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
 
   database:
     image: postgres:13-alpine
