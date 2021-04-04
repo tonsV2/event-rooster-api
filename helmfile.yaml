@@ -3,7 +3,7 @@ environments:
     values:
       - kubeContext: nuc
       - name: event-rooster-api
-      - host: event-rooster.api.dev.fitfit.dk
+      - hostname: event-rooster.api.dev.fitfit.dk
       - certIssuer: letsencrypt-staging
       - replicaCount: 1
       - postgresVersion: 10.1.1
@@ -12,7 +12,7 @@ environments:
     values:
       - kubeContext: nuc
       - name: event-rooster-api
-      - host: event-rooster.api.fitfit.dk
+      - hostname: event-rooster.api.fitfit.dk
       - certIssuer: letsencrypt-prod
       - replicaCount: 2
       - postgresVersion: 10.1.1
@@ -21,7 +21,7 @@ environments:
     values:
       - kubeContext: nuc
       - name: event-rooster-api-{{ .Environment.Name }}-{{ requiredEnv "FEATURE_TAG" }}
-      - host: event-rooster-{{ requiredEnv "FEATURE_TAG" }}.api.fitfit.dk
+      - hostname: event-rooster-{{ requiredEnv "FEATURE_TAG" }}.api.fitfit.dk
       - certIssuer: letsencrypt-staging
       - replicaCount: 1
       - postgresVersion: 10.1.1
@@ -34,7 +34,7 @@ releases:
     values:
       - ingress:
           enabled: true
-          hostname: {{ .Values.host }}
+          hostname: {{ .Values.hostname }}
           certIssuer: {{ .Values.certIssuer }}
       - replicaCount: {{ .Values.replicaCount }}
       - environmentVariables:
