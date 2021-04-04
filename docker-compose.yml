@@ -22,7 +22,7 @@ services:
     volumes:
       - .:/src
     working_dir: /src
-    command: /bin/sh -c 'go test -v ./test'
+    command: /bin/sh -c 'go test -v ./tests'
 
   database:
     image: postgres:13-alpine
