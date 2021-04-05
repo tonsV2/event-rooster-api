@@ -5,12 +5,7 @@ services:
     build: .
     ports:
       - 8080:8080
-    environment:
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_NAME: ${DATABASE_NAME}
+    command: /bin/sh -c 'sleep 5 && /app/event-rooster-api'
     env_file:
       - .env
 
