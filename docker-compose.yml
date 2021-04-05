@@ -12,7 +12,7 @@ services:
   test:
     build:
       context: .
-      target: build
+      target: builder
     volumes:
       - .:/src
     working_dir: /src
