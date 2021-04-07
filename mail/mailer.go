@@ -9,6 +9,7 @@ import (
 	"github.com/tonsV2/event-rooster-api/models"
 	"gopkg.in/mail.v2"
 	"html/template"
+	"log"
 )
 
 var testEmails = []string{"test@mail.com", "test1@mail.com", "test2@mail.com", "test3@mail.com", "test4@mail.com"}
@@ -83,6 +84,7 @@ func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buf
 	message.SetHeader("Subject", subject)
 	message.SetBody("text/html", body.String())
 	d := mail.NewDialer(m.configuration.Host, m.configuration.Port, m.configuration.Username, m.configuration.Password)
+	log.Printf("Mail sent: %+v", message)
 	if contains(testEmails, to) {
 		return nil
 	} else {
