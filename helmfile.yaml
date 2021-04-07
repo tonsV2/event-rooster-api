@@ -4,7 +4,7 @@ environments:
       - kubeContext: nuc
       - name: event-rooster-api
       - hostname: dev.api.lapio-groups.com
-      - certIssuer: letsencrypt-staging
+      - certIssuer: letsencrypt-prod
       - replicaCount: 1
       - postgresVersion: 10.1.1
 
