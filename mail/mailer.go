@@ -22,8 +22,6 @@ func ProvideMailer(mailerConfiguration configurations.MailerConfiguration) Maile
 	return Mailer{
 		configuration: mailerConfiguration,
 
-		from: "sebastianthegreatful@something.com",
-
 		createEventSubject:  "New event created",
 		createEventTemplate: templatePathPrefix + "mail/templates/createEvent.html",
 
@@ -34,7 +32,6 @@ func ProvideMailer(mailerConfiguration configurations.MailerConfiguration) Maile
 
 type Mailer struct {
 	configuration configurations.MailerConfiguration
-	from          string
 
 	createEventSubject  string
 	createEventTemplate string
@@ -58,7 +55,7 @@ func (m *Mailer) SendCreateEventMail(event models.Event) error {
 		Token:   event.Token,
 	})
 
-	return m.sendMail(m.from, to, m.createEventSubject, body)
+	return m.sendMail(m.configuration.Username, to, m.createEventSubject, body)
 }
 
 func (m *Mailer) SendWelcomeParticipantMail(event models.Event, participant models.Participant) error {
@@ -76,7 +73,7 @@ func (m *Mailer) SendWelcomeParticipantMail(event models.Event, participant mode
 		Token:   participant.Token,
 	})
 
-	return m.sendMail(m.from, participant.Email, m.welcomeParticipantSubject, body)
+	return m.sendMail(m.configuration.Username, participant.Email, m.welcomeParticipantSubject, body)
 }
 
 func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buffer) error {
