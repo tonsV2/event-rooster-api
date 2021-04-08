@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 const (
@@ -11,11 +12,11 @@ const (
 )
 
 func handleErrorWithMessage(c *gin.Context, statusCode int, err error, message string) {
+	log.Println(err)
 	c.JSON(statusCode, gin.H{"error": err.Error(), "message": message})
-	panic(err)
 }
 
 func handleError(c *gin.Context, statusCode int, err error) {
+	log.Println(err)
 	c.JSON(statusCode, gin.H{"error": err.Error()})
-	panic(err)
 }
