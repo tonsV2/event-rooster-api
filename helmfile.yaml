@@ -40,6 +40,8 @@ releases:
       - environmentVariables:
           GIN_MODE: release
 
+          DOMAIN_NAME: {{ .Values.hostname }}
+
           DATABASE_HOST: {{ requiredEnv "DATABASE_HOST" }}
           DATABASE_PORT: {{ requiredEnv "DATABASE_PORT" }}
           DATABASE_USERNAME: {{ requiredEnv "DATABASE_USERNAME" }}
