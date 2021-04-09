@@ -51,7 +51,15 @@ jobs:
 
       - name: Configure smoke test .env file
         run: |
-          echo "${{ secrets.DOTENV_SMOKE_TEST }}" > .env
+          echo "GIN_MODE=debug
+          DATABASE_DSN=/tmp/test.db
+
+          DOMAIN_NAME=dev.lapio-groups.com
+
+          SMTP_HOST=smtp.gmail.com
+          SMTP_PORT=587
+          SMTP_USERNAME=someuser@gmail.com
+          SMTP_PASSWORD=somepass" > .env
 
       - name: Smoke test Docker image
         run: |
