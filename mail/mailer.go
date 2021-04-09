@@ -47,31 +47,32 @@ func (m *Mailer) SendCreateEventMail(event models.Event) error {
 	t, _ := template.ParseFiles(m.createEventTemplate)
 	var body bytes.Buffer
 	_ = t.Execute(&body, struct {
-		Title   string
-		Message string
-		Token   string
+		DomainName string
+		Title      string
+		Token      string
 	}{
-		Title:   event.Title,
-		Message: "This is a test message in a HTML template",
-		Token:   event.Token,
+		DomainName: m.configuration.DomainName,
+		Title:      event.Title,
+		Token:      event.Token,
 	})
 
-	return m.sendMail(m.configuration.Username, to, m.createEventSubject, body)
+	subject := m.createEventSubject + ": " + event.Title
+	return m.sendMail(m.configuration.Username, to, subject, body)
 }
 
 func (m *Mailer) SendWelcomeParticipantMail(event models.Event, participant models.Participant) error {
 	t, _ := template.ParseFiles(m.welcomeParticipantTemplate)
 	var body bytes.Buffer
 	_ = t.Execute(&body, struct {
-		EventId uint
-		Title   string
-		Message string
-		Token   string
+		DomainName string
+		EventId    uint
+		Title      string
+		Token      string
 	}{
-		EventId: event.ID,
-		Title:   event.Title,
-		Message: "This is a test message in a HTML template",
-		Token:   participant.Token,
+		DomainName: m.configuration.DomainName,
+		EventId:    event.ID,
+		Title:      event.Title,
+		Token:      participant.Token,
 	})
 
 	return m.sendMail(m.configuration.Username, participant.Email, m.welcomeParticipantSubject, body)

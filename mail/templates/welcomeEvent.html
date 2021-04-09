@@ -2,8 +2,7 @@
 <html lang="en">
     <body>
         <p>Welcome to... {{.Title}}</p>
-        <span>Message: </span><span>{{.Message}}</span><br/>
         <p>Please select a group by using the below link</p>
-        <span>https://lapio-groups.com/event/{{.EventId}}?token={{.Token}}</span><br/>
+        <span>https://{{.DomainName}}/join-group?eventId={{.EventId}}&token={{.Token}}</span><br/>
     </body>
 </html>

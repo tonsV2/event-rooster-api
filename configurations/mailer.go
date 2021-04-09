@@ -5,6 +5,8 @@ import (
 )
 
 func ProvideMailerConfiguration() MailerConfiguration {
+	domainName := requireEnv("DOMAIN_NAME")
+
 	host := requireEnv("SMTP_HOST")
 	portStr := requireEnv("SMTP_PORT")
 	port, _ := strconv.Atoi(portStr)
@@ -12,16 +14,18 @@ func ProvideMailerConfiguration() MailerConfiguration {
 	password := requireEnv("SMTP_PASSWORD")
 
 	return MailerConfiguration{
-		Host:     host,
-		Port:     port,
-		Username: username,
-		Password: password,
+		DomainName: domainName,
+		Host:       host,
+		Port:       port,
+		Username:   username,
+		Password:   password,
 	}
 }
 
 type MailerConfiguration struct {
-	Host     string
-	Port     int
-	Username string
-	Password string
+	DomainName string
+	Host       string
+	Port       int
+	Username   string
+	Password   string
 }
