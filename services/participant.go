@@ -24,7 +24,13 @@ func (p *ParticipantService) CreateOrFind(name string, email string) (Participan
 
 	participant := Participant{Name: name, Email: email, Token: token}
 	err = p.participantRepository.Create(&participant)
-	if err != nil && err.Error() == "UNIQUE constraint failed: participants.email" {
+	// TODO: Better handling of error
+	// SQLite and Postgresql returns different error messages
+	// SQLite: UNIQUE constraint failed: participants.email
+	// Postgresql: duplicate key value violates unique constraint "participants_email_key"
+	// So currently the below code tries p.participantRepository.FindByEmail() in case of any kind of error from p.participantRepository.Create()
+	// It should only be for errors on "unique constraint", other kind of errors should be handled differently
+	if err != nil /*&& err.Error() == "UNIQUE constraint failed: participants.email"*/ {
 		return p.participantRepository.FindByEmail(email)
 	}
 	return participant, err
