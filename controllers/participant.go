@@ -75,16 +75,10 @@ func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context)
 	records := p.parseCSV(c, err)
 
 	participants := p.addParticipantsToEvent(c, event, records)
-	for _, participant := range participants {
-		if err := p.mailer.SendWelcomeParticipantMail(event, participant); err != nil {
-			handleError(c, http.StatusBadRequest, err)
-		}
-	}
-	/* TODO: Instead of the above for loop, send all participants to the mailer at once
+
 	if err := p.mailer.SendWelcomeParticipantMails(event, participants); err != nil {
 		handleError(c, http.StatusBadRequest, err)
 	}
-	*/
 
 	body := gin.H{"parsed": len(records), "new": len(participants)}
 	c.JSON(http.StatusCreated, body)

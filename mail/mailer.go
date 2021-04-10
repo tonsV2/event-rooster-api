@@ -61,9 +61,23 @@ func (m *Mailer) SendCreateEventMail(event models.Event) error {
 }
 
 func (m *Mailer) SendWelcomeParticipantMail(event models.Event, participant models.Participant) error {
+	return m.SendWelcomeParticipantMails(event, []models.Participant{participant})
+}
+
+func (m *Mailer) SendWelcomeParticipantMails(event models.Event, participants []models.Participant) error {
+	var messages []*mail.Message
+	for _, participant := range participants {
+		body := m.generateBody(event, participant)
+		message := m.generateMessage(m.configuration.Username, participant.Email, m.createEventSubject, body)
+		messages = append(messages, message)
+	}
+	return m.sendMails(messages)
+}
+
+func (m *Mailer) generateBody(event models.Event, participant models.Participant) bytes.Buffer {
 	t, _ := template.ParseFiles(m.welcomeParticipantTemplate)
 	var body bytes.Buffer
-	_ = t.Execute(&body, struct {
+	data := struct {
 		DomainName string
 		EventId    uint
 		Title      string
@@ -73,9 +87,45 @@ func (m *Mailer) SendWelcomeParticipantMail(event models.Event, participant mode
 		EventId:    event.ID,
 		Title:      event.Title,
 		Token:      participant.Token,
-	})
+	}
+	_ = t.Execute(&body, data)
 
-	return m.sendMail(m.configuration.Username, participant.Email, m.welcomeParticipantSubject, body)
+	return body
+}
+
+func (m *Mailer) generateMessage(from string, to string, subject string, body bytes.Buffer) *mail.Message {
+	message := mail.NewMessage()
+	message.SetHeader("From", from)
+	message.SetHeader("To", to)
+	message.SetHeader("Subject", subject)
+	message.SetBody("text/html", body.String())
+	return message
+}
+
+// Inspiration: https://github.com/go-mail/mail/blob/v2.3.1/example_test.go#L77
+func (m *Mailer) sendMails(messages []*mail.Message) error {
+	d := mail.NewDialer(m.configuration.Host, m.configuration.Port, m.configuration.Username, m.configuration.Password)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: false, ServerName: m.configuration.Host}
+
+	s, err := d.Dial()
+	if err != nil {
+		return err
+	}
+
+	for _, message := range messages {
+		log.Printf("Mail sent: %+v", message)
+		to := message.GetHeader("To")[0]
+		if contains(testEmails, to) {
+			continue
+		} else {
+			err := mail.Send(s, message)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buffer) error {
