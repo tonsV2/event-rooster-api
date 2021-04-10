@@ -23,11 +23,13 @@ func (e *EventController) CreateEvent(c *gin.Context) {
 	var input dtos.CreateEventDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
 		handleErrorWithMessage(c, http.StatusBadRequest, err, ParseDtoFail)
+		return
 	}
 
 	event, err := e.eventService.Create(input.Title, input.Datetime, input.Email)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusBadRequest, err, UnableToCreateEntity)
+		return
 	}
 
 	if err := e.mailer.SendCreateEventMail(event); err != nil {
@@ -44,6 +46,7 @@ func (e *EventController) FindEventWithGroupsByToken(c *gin.Context) {
 	event, err := e.eventService.FindEventWithGroupsByToken(token)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
+		return
 	}
 
 	eventDTO := dtos.ToEventWithGroupsDTO(event)
@@ -56,16 +59,19 @@ func (e *EventController) AddGroupToEventByToken(c *gin.Context) {
 	var input dtos.CreateGroupDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
 		handleErrorWithMessage(c, http.StatusBadRequest, err, ParseDtoFail)
+		return
 	}
 
 	event, err := e.eventService.FindByToken(token)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
+		return
 	}
 
 	group, err := e.groupService.Create(event.ID, input.Datetime, input.MaxParticipants)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusBadRequest, err, UnableToCreateEntity)
+		return
 	}
 
 	groupDTO := dtos.ToGroupDTO(group)
@@ -78,6 +84,7 @@ func (e *EventController) GetEventWithGroupsAndParticipantsByToken(c *gin.Contex
 	event, err := e.eventService.FindEventWithGroupsAndParticipantsByToken(token)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
+		return
 	}
 
 	eventDTO := dtos.ToEventWithGroupsAndParticipantsDTO(event)
@@ -90,6 +97,7 @@ func (e *EventController) FindEventParticipantsNotInAGroupByToken(c *gin.Context
 	participants, err := e.eventService.FindEventParticipantsNotInAGroupByToken(token)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
+		return
 	}
 
 	participantDTOS := dtos.ToParticipantsWithoutTokenDTO(participants)

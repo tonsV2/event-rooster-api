@@ -32,11 +32,13 @@ func (p *ParticipantController) AddParticipantToEventByToken(c *gin.Context) {
 	var input dtos.CreateParticipantDTO
 	if err := c.ShouldBindJSON(&input); err != nil {
 		handleErrorWithMessage(c, http.StatusBadRequest, err, ParseDtoFail)
+		return
 	}
 
 	event, err := p.eventService.FindByToken(token)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
+		return
 	}
 
 	participant := p.addParticipantToEvent(c, event, input.Name, input.Email)
@@ -45,6 +47,7 @@ func (p *ParticipantController) AddParticipantToEventByToken(c *gin.Context) {
 	c.JSON(http.StatusCreated, participantDTO)
 }
 
+// TODO: Should return err and http.Status* so it can be handled and the request can be terminated
 func (p *ParticipantController) addParticipantToEvent(c *gin.Context, event models.Event, name string, email string) models.Participant {
 	participant, err := p.participantService.CreateOrFind(name, email)
 	if err != nil {
@@ -70,6 +73,7 @@ func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context)
 	event, err := p.eventService.FindByToken(token)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
+		return
 	}
 
 	records := p.parseCSV(c, err)
@@ -78,12 +82,14 @@ func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context)
 
 	if err := p.mailer.SendWelcomeParticipantMails(event, participants); err != nil {
 		handleError(c, http.StatusBadRequest, err)
+		return
 	}
 
 	body := gin.H{"parsed": len(records), "new": len(participants)}
 	c.JSON(http.StatusCreated, body)
 }
 
+// TODO: Should return err and http.Status* so it can be handled and the request can be terminated
 func (p *ParticipantController) parseCSV(c *gin.Context, err error) [][]string {
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -114,6 +120,7 @@ func (p *ParticipantController) parseCSV(c *gin.Context, err error) [][]string {
 	return records
 }
 
+// TODO: Should return err and http.Status* so it can be handled and the request can be terminated
 func (p *ParticipantController) addParticipantsToEvent(c *gin.Context, event models.Event, records [][]string) []models.Participant {
 	var participants []models.Participant
 
@@ -149,11 +156,13 @@ func (p *ParticipantController) AddParticipantToGroupByToken(c *gin.Context) {
 	participant, err := p.participantService.FindByToken(token)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
+		return
 	}
 
 	group, err := p.groupService.FindById(groupId)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
+		return
 	}
 
 	isInEvent := p.eventService.IsParticipantInEvent(token, group.EventID)
@@ -165,19 +174,23 @@ func (p *ParticipantController) AddParticipantToGroupByToken(c *gin.Context) {
 	event, err := p.eventService.FindById(group.EventID)
 	if err != nil {
 		handleError(c, http.StatusNotFound, err)
+		return
 	}
 
 	if p.isGroupFull(event, group.ID) {
 		handleError(c, http.StatusForbidden, errors.New("group is full"))
+		return
 	}
 
 	err = p.groupService.AddParticipant(group, participant)
 	if err != nil {
 		handleError(c, http.StatusBadRequest, err)
+		return
 	}
 
 	if err := p.mailer.SendWelcomeToGroupMail(event, group, participant); err != nil {
 		handleError(c, http.StatusBadRequest, err)
+		return
 	}
 
 	participantDTO := dtos.ToParticipantDTO(participant)
