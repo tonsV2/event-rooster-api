@@ -23,9 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Configure .env file
+        run: |
+          echo "${{ secrets.DOTENV_TEST }}" > .env
+
       - name: Run tests
         run: |
-          touch .env
           docker-compose build test
           docker-compose run test
 
@@ -48,18 +51,6 @@ jobs:
       - name: Build image
         run: |
           docker-compose build prod
-
-      - name: Configure smoke test .env file
-        run: |
-          echo "GIN_MODE=debug
-          DATABASE_DSN=/tmp/test.db
-
-          DOMAIN_NAME=dev.lapio-groups.com
-
-          SMTP_HOST=smtp.gmail.com
-          SMTP_PORT=587
-          SMTP_USERNAME=someuser@gmail.com
-          SMTP_PASSWORD=somepass" > .env
 
       - name: Smoke test Docker image
         run: |
