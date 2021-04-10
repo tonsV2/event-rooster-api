@@ -78,6 +78,12 @@ http post ":8080/participants/groups?groupId=2&token=$PARTICIPANT3_TOKEN"
 # Get event with groups and participants
 http ":8080/events?token=$EVENT_TOKEN"
 
+# Upload participants
+http --form ":8080/participants/csv?token=$EVENT_TOKEN" file@tests/testdata/participants.csv
+
+# Re-upload participants
+http --form ":8080/participants/csv?token=$EVENT_TOKEN" file@tests/testdata/participants.csv
+
 
 echo "Convenience links"
 echo "http://localhost:8081/show-event?token=$EVENT_TOKEN"
@@ -86,3 +92,4 @@ echo "4th participant join group"
 echo "http://localhost:8081/join-group?eventId=1&token=$PARTICIPANT4_TOKEN"
 echo "3th participant join group"
 echo "http://localhost:8081/join-group?eventId=1&token=$PARTICIPANT3_TOKEN"
+

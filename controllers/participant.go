@@ -10,10 +10,9 @@ import (
 	"github.com/tonsV2/event-rooster-api/mail"
 	"github.com/tonsV2/event-rooster-api/models"
 	"github.com/tonsV2/event-rooster-api/services"
-	"io"
-	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func ProvideParticipantController(r services.EventService, p services.ParticipantService, m mail.Mailer, g services.GroupService) ParticipantController {
@@ -46,7 +45,25 @@ func (p *ParticipantController) AddParticipantToEventByToken(c *gin.Context) {
 	c.JSON(http.StatusCreated, participantDTO)
 }
 
-// TODO: Send mails in "bulk" - https://github.com/go-mail/mail/blob/v2.3.1/example_test.go#L77
+func (p *ParticipantController) addParticipantToEvent(c *gin.Context, event models.Event, name string, email string) models.Participant {
+	participant, err := p.participantService.CreateOrFind(name, email)
+	if err != nil {
+		handleError(c, http.StatusBadRequest, err)
+	}
+
+	err = p.eventService.AddParticipantToEvent(event, participant)
+	if err != nil {
+		handleError(c, http.StatusBadRequest, err)
+	}
+
+	// TODO: Don't send mail if participant already added to event
+	if err := p.mailer.SendWelcomeParticipantMail(event, participant); err != nil {
+		handleError(c, http.StatusBadRequest, err)
+	}
+
+	return participant
+}
+
 func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context) {
 	token := c.Query("token")
 
@@ -55,6 +72,25 @@ func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context)
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
+	records := p.parseCSV(c, err)
+
+	participants := p.addParticipantsToEvent(c, event, records)
+	for _, participant := range participants {
+		if err := p.mailer.SendWelcomeParticipantMail(event, participant); err != nil {
+			handleError(c, http.StatusBadRequest, err)
+		}
+	}
+	/* TODO: Instead of the above for loop, send all participants to the mailer at once
+	if err := p.mailer.SendWelcomeParticipantMails(event, participants); err != nil {
+		handleError(c, http.StatusBadRequest, err)
+	}
+	*/
+
+	body := gin.H{"parsed": len(records), "new": len(participants)}
+	c.JSON(http.StatusCreated, body)
+}
+
+func (p *ParticipantController) parseCSV(c *gin.Context, err error) [][]string {
 	file, err := c.FormFile("file")
 	if err != nil {
 		handleError(c, http.StatusInternalServerError, err)
@@ -76,51 +112,40 @@ func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context)
 	}
 
 	r := csv.NewReader(in)
-
-	count := 0
-	for {
-		record, err := r.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		name := record[0]
-		email := record[1]
-
-		p.addParticipantToEvent(c, event, name, email)
-		count++
-	}
+	records, err := r.ReadAll()
 
 	if err := os.Remove(newFileName); err != nil {
 		handleError(c, http.StatusInternalServerError, err)
 	}
-
-	c.JSON(http.StatusCreated, fmt.Sprintf("%d participants parsed", count))
+	return records
 }
 
-// TODO: Skip silently if participant is already added?
-func (p *ParticipantController) addParticipantToEvent(c *gin.Context, event models.Event, name string, email string) models.Participant {
-	participant, err := p.participantService.CreateOrFind(name, email)
-	if err != nil {
-		handleError(c, http.StatusBadRequest, err)
+func (p *ParticipantController) addParticipantsToEvent(c *gin.Context, event models.Event, records [][]string) []models.Participant {
+	var participants []models.Participant
+
+	for _, record := range records {
+		name := record[0]
+		email := record[1]
+
+		participant, err := p.participantService.CreateOrFind(name, email)
+		if err != nil {
+			handleError(c, http.StatusBadRequest, err)
+		}
+
+		isInEvent := p.eventService.IsParticipantInEvent(participant.Token, event.ID)
+		if isInEvent {
+			continue
+		}
+
+		err = p.eventService.AddParticipantToEvent(event, participant)
+		if err != nil {
+			handleError(c, http.StatusBadRequest, err)
+		}
+
+		participants = append(participants, participant)
 	}
 
-	err = p.eventService.AddParticipantToEvent(event, participant)
-	if err != nil {
-		handleError(c, http.StatusBadRequest, err)
-	}
-
-	// TODO: Don't send mail if participant already added to event
-	if err := p.mailer.SendWelcomeParticipantMail(event, participant); err != nil {
-		handleError(c, http.StatusBadRequest, err)
-	}
-
-	return participant
+	return participants
 }
 
 func (p *ParticipantController) AddParticipantToGroupByToken(c *gin.Context) {
@@ -137,10 +162,15 @@ func (p *ParticipantController) AddParticipantToGroupByToken(c *gin.Context) {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
-	// Confirm participant is associated with event
-	event, err := p.eventService.FindByIdAndParticipantToken(group.EventID, token)
+	isInEvent := p.eventService.IsParticipantInEvent(token, group.EventID)
+	if !isInEvent {
+		handleError(c, http.StatusNotFound, errors.New(strings.ToLower(EntityNotFound)))
+		return
+	}
+
+	event, err := p.eventService.FindById(group.EventID)
 	if err != nil {
-		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
+		handleError(c, http.StatusNotFound, err)
 	}
 
 	if p.isGroupFull(event, group.ID) {

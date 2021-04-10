@@ -26,12 +26,12 @@ func (g GroupController) GetGroupsWithParticipantsCountByEventIdAndParticipantTo
 
 	participantToken := c.Query("token")
 
-	event, err := g.eventService.FindByIdAndParticipantToken(uint(eventId), participantToken)
-	if err != nil {
+	isInEvent := g.eventService.IsParticipantInEvent(participantToken, uint(eventId))
+	if !isInEvent {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}
 
-	groupsWithParticipantsCount, err := g.groupService.FindGroupsWithParticipantsCountByEventId(event.ID)
+	groupsWithParticipantsCount, err := g.groupService.FindGroupsWithParticipantsCountByEventId(uint(eventId))
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusNotFound, err, EntityNotFound)
 	}

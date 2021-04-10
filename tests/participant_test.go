@@ -57,19 +57,43 @@ func TestAddParticipantsCSVToEventByToken(t *testing.T) {
 	filename := "./testdata/participants.csv"
 	csvData, _ := ioutil.ReadFile(filename)
 
+	query := gofight.H{"token": createdEvent.Token}
+	uploads := []gofight.UploadFile{
+		{
+			Name:    "file",
+			Content: csvData,
+		},
+	}
+
 	r.POST("/participants/csv").
-		SetQuery(gofight.H{"token": createdEvent.Token}).
-		SetFileFromPath([]gofight.UploadFile{
-			{
-				Name:    "file",
-				Content: csvData,
-			},
-		}).
+		SetQuery(query).
+		SetFileFromPath(uploads).
 		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
 
-			body := r.Body.String()
+			json := r.Body.String()
 
-			assert.Equal(t, "\"3 participants parsed\"", body)
+			parsed := gjson.Get(json, "parsed")
+			myNew := gjson.Get(json, "new")
+
+			assert.Equal(t, 3, int(parsed.Int()))
+			assert.Equal(t, 3, int(myNew.Int()))
+
+			assert.Equal(t, http.StatusCreated, r.Code)
+		})
+
+	r.POST("/participants/csv").
+		SetQuery(query).
+		SetFileFromPath(uploads).
+		Run(server.Engine, func(r gofight.HTTPResponse, rq gofight.HTTPRequest) {
+
+			json := r.Body.String()
+
+			parsed := gjson.Get(json, "parsed")
+			myNew := gjson.Get(json, "new")
+
+			assert.Equal(t, 3, int(parsed.Int()))
+			assert.Equal(t, 0, int(myNew.Int()))
+
 			assert.Equal(t, http.StatusCreated, r.Code)
 		})
 }

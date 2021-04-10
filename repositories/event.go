@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"errors"
 	"github.com/tonsV2/event-rooster-api/models"
 	"gorm.io/gorm"
 )
@@ -30,18 +29,20 @@ func (p *EventRepository) FindByToken(token string) (models.Event, error) {
 	return event, err
 }
 
+func (p *EventRepository) FindById(eventId uint) (models.Event, error) {
+	var event models.Event
+	err := p.db.First(&event, eventId).Error
+	return event, err
+}
+
 func (p *EventRepository) AddParticipant(event models.Event, participant models.Participant) error {
 	return p.db.Model(&event).Association("Participants").Append([]*models.Participant{&participant})
 }
 
-func (p *EventRepository) FindByIdAndParticipantToken(eventId uint, participantToken string) (models.Event, error) {
+func (p *EventRepository) IsParticipantInEvent(participantToken string, eventId uint) bool {
 	var event models.Event
 	p.db.Preload("Participants", "participants.token = ?", participantToken).First(&event, eventId)
-	if len(event.Participants) < 1 {
-		return event, errors.New("participant not associated with event")
-	} else {
-		return event, nil
-	}
+	return len(event.Participants) > 0
 }
 
 func (p *EventRepository) FindEventWithGroupsAndParticipantsByToken(token string) (models.Event, error) {

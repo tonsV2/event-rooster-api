@@ -36,12 +36,16 @@ func (r *EventService) FindByToken(token string) (Event, error) {
 	return r.eventRepository.FindByToken(token)
 }
 
+func (r *EventService) FindById(eventId uint) (Event, error) {
+	return r.eventRepository.FindById(eventId)
+}
+
 func (r *EventService) AddParticipantToEvent(event Event, participant Participant) error {
 	return r.eventRepository.AddParticipant(event, participant)
 }
 
-func (r *EventService) FindByIdAndParticipantToken(eventId uint, participantToken string) (Event, error) {
-	return r.eventRepository.FindByIdAndParticipantToken(eventId, participantToken)
+func (r *EventService) IsParticipantInEvent(participantToken string, eventId uint) bool {
+	return r.eventRepository.IsParticipantInEvent(participantToken, eventId)
 }
 
 func (r *EventService) FindEventWithGroupsAndParticipantsByToken(token string) (Event, error) {
