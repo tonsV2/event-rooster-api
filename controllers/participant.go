@@ -46,6 +46,7 @@ func (p *ParticipantController) AddParticipantToEventByToken(c *gin.Context) {
 	c.JSON(http.StatusCreated, participantDTO)
 }
 
+// TODO: Send mails in "bulk" - https://github.com/go-mail/mail/blob/v2.3.1/example_test.go#L77
 func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context) {
 	token := c.Query("token")
 
@@ -102,6 +103,7 @@ func (p *ParticipantController) AddParticipantsCSVToEventByToken(c *gin.Context)
 	c.JSON(http.StatusCreated, fmt.Sprintf("%d participants parsed", count))
 }
 
+// TODO: Skip silently if participant is already added?
 func (p *ParticipantController) addParticipantToEvent(c *gin.Context, event models.Event, name string, email string) models.Participant {
 	participant, err := p.participantService.CreateOrFind(name, email)
 	if err != nil {
