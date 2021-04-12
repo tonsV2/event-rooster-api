@@ -107,7 +107,7 @@ func TestAddParticipantToGroupByToken(t *testing.T) {
 	event, _ := eventService.Create("title", time.Now(), testEmail)
 
 	groupService := getGroupService()
-	group, _ := groupService.Create(event.ID, time.Now(), 25)
+	group, _ := groupService.Create(event.ID, "1", time.Now(), 25)
 	groupId := strconv.Itoa(int(group.ID))
 
 	participantService := getParticipantService()

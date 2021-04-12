@@ -68,7 +68,7 @@ func (e *EventController) AddGroupToEventByToken(c *gin.Context) {
 		return
 	}
 
-	group, err := e.groupService.Create(event.ID, input.Datetime, input.MaxParticipants)
+	group, err := e.groupService.Create(event.ID, input.GID, input.Datetime, input.MaxParticipants)
 	if err != nil {
 		handleErrorWithMessage(c, http.StatusBadRequest, err, UnableToCreateEntity)
 		return

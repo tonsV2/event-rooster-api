@@ -7,7 +7,8 @@ import (
 
 type Group struct {
 	gorm.Model
-	EventID         uint
+	GID             string `gorm:"uniqueIndex:gid_unique_on_event"`
+	EventID         uint   `gorm:"uniqueIndex:gid_unique_on_event"`
 	Datetime        time.Time
 	MaxParticipants uint
 	Participants    []Participant `gorm:"many2many:participant_groups;"`
@@ -15,6 +16,7 @@ type Group struct {
 
 type GroupWithParticipantsCount struct {
 	ID                 uint
+	GID                string
 	MaxParticipants    uint
 	ActualParticipants uint
 }

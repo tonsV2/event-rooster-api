@@ -20,10 +20,11 @@ func TestGetGroupsWithParticipantsCountByEventIdAndParticipantToken(t *testing.T
 	event, _ := eventService.Create("title", time.Now(), testEmail)
 
 	groupService := getGroupService()
-	datetime := time.Now()
-	actualMaxParticipants := uint(25)
+	expectedGid := "1"
+	expectedDatetime := time.Now()
+	expectedActualMaxParticipants := uint(25)
 
-	group, _ := groupService.Create(event.ID, datetime, actualMaxParticipants)
+	group, _ := groupService.Create(event.ID, expectedGid, expectedDatetime, expectedActualMaxParticipants)
 
 	participantService := getParticipantService()
 	participant, _ := participantService.CreateOrFind("name", testEmail)
@@ -45,7 +46,10 @@ func TestGetGroupsWithParticipantsCountByEventIdAndParticipantToken(t *testing.T
 			assert.Equal(t, group.ID, uint(id.Uint()))
 
 			maxParticipants := gjson.Get(json, "0.maxParticipants")
-			assert.Equal(t, actualMaxParticipants, uint(maxParticipants.Uint()))
+			assert.Equal(t, expectedActualMaxParticipants, uint(maxParticipants.Uint()))
+
+			gid := gjson.Get(json, "0.gid")
+			assert.Equal(t, expectedGid, gid.String())
 
 			actualParticipants := gjson.Get(json, "0.actualParticipants")
 			assert.Equal(t, uint(0), uint(actualParticipants.Uint()))

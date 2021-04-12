@@ -14,8 +14,8 @@ func ProvideGroupService(r GroupRepository) GroupService {
 	return GroupService{groupRepository: r}
 }
 
-func (g *GroupService) Create(eventId uint, datetime time.Time, maxParticipants uint) (Group, error) {
-	group := Group{EventID: eventId, Datetime: datetime, MaxParticipants: maxParticipants}
+func (g *GroupService) Create(eventId uint, gid string, datetime time.Time, maxParticipants uint) (Group, error) {
+	group := Group{EventID: eventId, GID: gid, Datetime: datetime, MaxParticipants: maxParticipants}
 	err := g.groupRepository.Create(&group)
 	return group, err
 }

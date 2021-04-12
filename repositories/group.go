@@ -28,7 +28,7 @@ func (g *GroupRepository) FindGroupsWithParticipantsCountByEventId(id uint, grou
 
 	return g.db.
 		Model(models.Group{}).
-		Select("id, max_participants, count(participant_id) as actual_participants").
+		Select("id, max_participants, count(participant_id) as actual_participants, g_id").
 		Where("event_id = ?", id).
 		Joins("left join participant_groups pg on groups.id = pg.group_id").
 		Group("groups.id").

@@ -76,9 +76,10 @@ func TestAddGroupToEventByToken(t *testing.T) {
 	eventService := getEventService()
 	createdEvent, _ := eventService.Create("title", time.Now(), testEmail)
 
+	expectedGid := "1"
 	expectedDatetime := time.Now()
 	expectedMaxParticipants := uint(25)
-	groupDTO := dtos.CreateGroupDTO{Datetime: expectedDatetime, MaxParticipants: expectedMaxParticipants}
+	groupDTO := dtos.CreateGroupDTO{GID: expectedGid, Datetime: expectedDatetime, MaxParticipants: expectedMaxParticipants}
 
 	r.POST("/events/groups").
 		SetQuery(gofight.H{"token": createdEvent.Token}).
@@ -87,9 +88,11 @@ func TestAddGroupToEventByToken(t *testing.T) {
 
 			json := r.Body.String()
 
+			gid := gjson.Get(json, "gid")
 			datetime := gjson.Get(json, "datetime")
 			maxParticipants := gjson.Get(json, "maxParticipants")
 
+			assert.Equal(t, expectedGid, gid.String())
 			assert.True(t, CompareTimeToResult(expectedDatetime, datetime))
 			assert.Equal(t, expectedMaxParticipants, uint(maxParticipants.Uint()))
 			assert.Equal(t, http.StatusCreated, r.Code)
@@ -105,8 +108,8 @@ func TestGetEventWithGroupsAndParticipantsByToken(t *testing.T) {
 	event, _ := eventService.Create("title", time.Now(), testEmail)
 
 	groupService := getGroupService()
-	group0, _ := groupService.Create(event.ID, time.Now(), 25)
-	group1, _ := groupService.Create(event.ID, time.Now(), 25)
+	group0, _ := groupService.Create(event.ID, "1", time.Now(), 25)
+	group1, _ := groupService.Create(event.ID, "2", time.Now(), 25)
 
 	participantService := getParticipantService()
 	participant0, _ := participantService.CreateOrFind("name0", "test@mail.com")
@@ -132,6 +135,9 @@ func TestGetEventWithGroupsAndParticipantsByToken(t *testing.T) {
 
 			title := gjson.Get(json, "title")
 			assert.Equal(t, event.Title, title.String())
+
+			group0Gid := gjson.Get(json, "groups.0.gid")
+			assert.Equal(t, group0.GID, group0Gid.String())
 
 			group0Datetime := gjson.Get(json, "groups.0.datetime")
 			assert.True(t, CompareTimeToResult(group0.Datetime, group0Datetime))
@@ -167,7 +173,7 @@ func TestFindEventParticipantsNotInAGroupByToken(t *testing.T) {
 	event, _ := eventService.Create("title", time.Now(), testEmail)
 
 	groupService := getGroupService()
-	group0, _ := groupService.Create(event.ID, time.Now(), 25)
+	group0, _ := groupService.Create(event.ID, "1", time.Now(), 25)
 
 	participantService := getParticipantService()
 	participant0, _ := participantService.CreateOrFind("name0", "test@mail.com")

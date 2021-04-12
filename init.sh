@@ -14,12 +14,14 @@ export EVENT_TOKEN=$(echo '{
 
 # Create group
 echo '{
+  "gid": "1",
   "datetime": "2019-10-12T07:20:50.52Z",
   "maxParticipants": 2
 }' | http :8080/events/groups?token=$EVENT_TOKEN
 
 # Create another group
 echo '{
+  "gid": "2",
   "datetime": "2019-10-12T07:20:50.52Z",
   "maxParticipants": 2
 }' | http :8080/events/groups?token=$EVENT_TOKEN
@@ -92,4 +94,3 @@ echo "4th participant join group"
 echo "http://localhost:8081/join-group?eventId=1&token=$PARTICIPANT4_TOKEN"
 echo "3th participant join group"
 echo "http://localhost:8081/join-group?eventId=1&token=$PARTICIPANT3_TOKEN"
-

@@ -6,12 +6,14 @@ import (
 )
 
 type CreateGroupDTO struct {
+	GID             string    `json:"gid" binding:"required"`
 	Datetime        time.Time `json:"datetime" binding:"required"`
 	MaxParticipants uint      `json:"maxParticipants" binding:"required"`
 }
 
 type GroupDTO struct {
-	ID              uint             `json:"id,string,omitempty"`
+	ID              uint             `json:"id,omitempty"`
+	GID             string           `json:"gid"`
 	Datetime        time.Time        `json:"datetime"`
 	MaxParticipants uint             `json:"maxParticipants"`
 	Participants    []ParticipantDTO `json:"participants,omitempty"`
@@ -19,7 +21,7 @@ type GroupDTO struct {
 }
 
 func ToGroupDTO(group models.Group) GroupDTO {
-	return GroupDTO{ID: group.ID, Datetime: group.Datetime, MaxParticipants: group.MaxParticipants, CreatedAt: group.CreatedAt}
+	return GroupDTO{ID: group.ID, GID: group.GID, Datetime: group.Datetime, MaxParticipants: group.MaxParticipants, CreatedAt: group.CreatedAt}
 }
 
 func ToGroupWithParticipantsDTO(group models.Group) GroupDTO {
@@ -31,6 +33,7 @@ func ToGroupWithParticipantsDTO(group models.Group) GroupDTO {
 
 	return GroupDTO{
 		ID:              group.ID,
+		GID:             group.GID,
 		Datetime:        group.Datetime,
 		MaxParticipants: group.MaxParticipants,
 		Participants:    participantDtos,
@@ -38,14 +41,16 @@ func ToGroupWithParticipantsDTO(group models.Group) GroupDTO {
 }
 
 type GroupWithParticipantsCountDTO struct {
-	ID                 uint `json:"id,string,omitempty"`
-	MaxParticipants    uint `json:"maxParticipants"`
-	ActualParticipants uint `json:"actualParticipants"`
+	ID                 uint   `json:"id,omitempty"`
+	GID                string `json:"gid"`
+	MaxParticipants    uint   `json:"maxParticipants"`
+	ActualParticipants uint   `json:"actualParticipants"`
 }
 
 func ToGroupWithParticipantsCountDTO(groupWithParticipantsCount models.GroupWithParticipantsCount) GroupWithParticipantsCountDTO {
 	return GroupWithParticipantsCountDTO{
 		ID:                 groupWithParticipantsCount.ID,
+		GID:                groupWithParticipantsCount.GID,
 		MaxParticipants:    groupWithParticipantsCount.MaxParticipants,
 		ActualParticipants: groupWithParticipantsCount.ActualParticipants,
 	}
