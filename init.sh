@@ -9,20 +9,20 @@ set -x
 export EVENT_TOKEN=$(echo '{
   "title": "title",
   "email": "test@mail.com",
-  "datetime": "2019-10-12T07:20:50.52Z"
+  "datetime": "2019-10-12T07:20:50.52+07:00"
 }' | http :8080/events | jq -r '.token')
 
 # Create group
 echo '{
   "gid": "1",
-  "datetime": "2019-10-12T07:20:50.52Z",
+  "datetime": "2019-10-12T07:20:50.52+07:00",
   "maxParticipants": 2
 }' | http :8080/events/groups?token=$EVENT_TOKEN
 
 # Create another group
 echo '{
   "gid": "2",
-  "datetime": "2019-10-12T07:20:50.52Z",
+  "datetime": "2019-10-12T07:20:50.52+07:00",
   "maxParticipants": 2
 }' | http :8080/events/groups?token=$EVENT_TOKEN
 
