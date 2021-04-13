@@ -28,7 +28,7 @@ func ToGroupWithParticipantsDTO(group models.Group) GroupDTO {
 	participantDtos := make([]ParticipantDTO, len(group.Participants))
 
 	for i, participant := range group.Participants {
-		participantDtos[i] = ToParticipantWithoutTokenDTO(participant)
+		participantDtos[i] = ToParticipantDTO(participant)
 	}
 
 	return GroupDTO{

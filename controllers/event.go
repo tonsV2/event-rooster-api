@@ -100,6 +100,6 @@ func (e *EventController) FindEventParticipantsNotInAGroupByToken(c *gin.Context
 		return
 	}
 
-	participantDTOS := dtos.ToParticipantsWithoutTokenDTO(participants)
+	participantDTOS := dtos.ToParticipantsDTO(participants)
 	c.JSON(http.StatusOK, participantDTOS)
 }
