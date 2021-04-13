@@ -41,16 +41,18 @@ func ToGroupWithParticipantsDTO(group models.Group) GroupDTO {
 }
 
 type GroupWithParticipantsCountDTO struct {
-	ID                 uint   `json:"id,omitempty"`
-	GID                string `json:"gid"`
-	MaxParticipants    uint   `json:"maxParticipants"`
-	ActualParticipants uint   `json:"actualParticipants"`
+	ID                 uint      `json:"id,omitempty"`
+	GID                string    `json:"gid"`
+	Datetime           time.Time `json:"datetime"`
+	MaxParticipants    uint      `json:"maxParticipants"`
+	ActualParticipants uint      `json:"actualParticipants"`
 }
 
 func ToGroupWithParticipantsCountDTO(groupWithParticipantsCount models.GroupWithParticipantsCount) GroupWithParticipantsCountDTO {
 	return GroupWithParticipantsCountDTO{
 		ID:                 groupWithParticipantsCount.ID,
 		GID:                groupWithParticipantsCount.GID,
+		Datetime:           groupWithParticipantsCount.Datetime,
 		MaxParticipants:    groupWithParticipantsCount.MaxParticipants,
 		ActualParticipants: groupWithParticipantsCount.ActualParticipants,
 	}

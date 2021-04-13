@@ -17,6 +17,7 @@ type Group struct {
 type GroupWithParticipantsCount struct {
 	ID                 uint
 	GID                string
+	Datetime           time.Time
 	MaxParticipants    uint
 	ActualParticipants uint
 }
