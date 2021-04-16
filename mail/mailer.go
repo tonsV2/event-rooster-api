@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"crypto/tls"
 	"flag"
-	"fmt"
+	"github.com/dustin/go-humanize"
 	"github.com/tonsV2/event-rooster-api/configurations"
 	"github.com/tonsV2/event-rooster-api/models"
 	"gopkg.in/mail.v2"
 	"html/template"
 	"log"
+	"strconv"
 )
 
 var testEmails = []string{"test@mail.com", "test1@mail.com", "test2@mail.com", "test3@mail.com", "test4@mail.com"}
@@ -28,6 +29,9 @@ func ProvideMailer(mailerConfiguration configurations.MailerConfiguration) Maile
 
 		welcomeParticipantSubject:  "Welcome to the event",
 		welcomeParticipantTemplate: templatePathPrefix + "mail/templates/welcomeEvent.html",
+
+		joinGroupSubject:  "Welcome to",
+		joinGroupTemplate: templatePathPrefix + "mail/templates/joinGroup.html",
 	}
 }
 
@@ -39,6 +43,9 @@ type Mailer struct {
 
 	welcomeParticipantSubject  string
 	welcomeParticipantTemplate string
+
+	joinGroupSubject  string
+	joinGroupTemplate string
 }
 
 func (m *Mailer) SendCreateEventMail(event models.Event) error {
@@ -145,8 +152,30 @@ func (m *Mailer) sendMail(from string, to string, subject string, body bytes.Buf
 }
 
 func (m *Mailer) SendWelcomeToGroupMail(event models.Event, group models.Group, participant models.Participant) error {
-	fmt.Println("TODO: Send welcome to group mail")
-	return nil
+	to := event.Email
+
+	gid, err := strconv.Atoi(group.GID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	gidOrdinalized := humanize.Ordinal(gid)
+
+	t, _ := template.ParseFiles(m.joinGroupTemplate)
+	var body bytes.Buffer
+	_ = t.Execute(&body, struct {
+		DomainName string
+		GID        string
+		Token      string
+		EventId    string
+	}{
+		DomainName: m.configuration.DomainName,
+		GID:        gidOrdinalized,
+		Token:      event.Token,
+		EventId:    event.Token,
+	})
+
+	subject := m.joinGroupSubject + " " + gidOrdinalized + " group"
+	return m.sendMail(m.configuration.Username, to, subject, body)
 }
 
 func contains(s []string, str string) bool {
