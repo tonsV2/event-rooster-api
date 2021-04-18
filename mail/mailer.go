@@ -166,12 +166,12 @@ func (m *Mailer) SendWelcomeToGroupMail(event models.Event, group models.Group, 
 		DomainName string
 		GID        string
 		Token      string
-		EventId    string
+		EventId    uint
 	}{
 		DomainName: m.configuration.DomainName,
 		GID:        gidOrdinalized,
-		Token:      event.Token,
-		EventId:    event.Token,
+		Token:      participant.Token,
+		EventId:    event.ID,
 	})
 
 	subject := m.joinGroupSubject + " " + gidOrdinalized + " group"
